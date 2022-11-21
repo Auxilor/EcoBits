@@ -107,7 +107,7 @@ class CommandPay(
 
         if (args.size == 3) {
             StringUtil.copyPartialMatches(
-                args[1],
+                args[2],
                 arrayOf(1, 2, 3, 4, 5).map { it.toString() },
                 completions
             )

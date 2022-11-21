@@ -30,6 +30,8 @@ permissions:
       ecobits.command.get: true
       ecobits.command.set: true
       ecobits.command.reset: true
+      ecobits.command.pay: true
+      ecobits.command.balance: true
 
   ecobits.command.reload:
     description: Allows reloading the config
@@ -49,3 +51,9 @@ permissions:
   ecobits.command.reset:
     description: Resets a currency
     default: op
+  ecobits.command.pay:
+    description: Pays a player
+    default: true
+  ecobits.command.balance:
+    description: Views your balance
+    default: true

@@ -1,3 +1,5 @@
+@file:JvmName("CurrencyUtils")
+
 package com.willfp.ecobits.currencies
 
 import com.willfp.eco.core.EcoPlugin
@@ -27,6 +29,10 @@ class Currency(
 
     val name = config.getFormattedString("name")
     val max = config.getDouble("max").let { if (it < 0) Double.MAX_VALUE else it }
+
+    val isPayable = config.getBool("payable")
+
+    val isDecimal = config.getBool("decimal")
 
     init {
         PlaceholderManager.registerPlaceholder(

@@ -46,7 +46,7 @@ class CommandGet(
         }
 
         sender.sendMessage(
-            plugin.langYml.getMessage("balance", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            plugin.langYml.getMessage("other-balance", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%player%", player.savedDisplayName)
                 .replace("%amount%", player.getBalance(currency).toNiceString())
                 .replace("%currency%", currency.name)

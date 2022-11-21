@@ -12,4 +12,7 @@ messages:
   set-currency: "&fSet %player%&r to have &a%amount%&r &f%currency%&f!"
   reset-currency: "&fReset %player%&r to have &a%amount%&r &f%currency%&f!"
   gave-currency: "&fGave %player%&r &a%amount%&r &f%currency%&f!"
-  balance: "&f%player%&f has &a%amount%&r &f%currency%&f!"
+  other-balance: "&f%player%&f has &a%amount%&r &f%currency%&f!"
+  balance: "You have &a%amount%&r &f%currency%&f!"
+  cannot-afford: "&cYou can't afford to do this!"
+  paid-player: "&fYou paid %player%&r &a%amount%&r &f%currency%&f!"

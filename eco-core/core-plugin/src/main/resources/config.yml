@@ -3,8 +3,21 @@
 # by Auxilor
 #
 
+# Want to use these currencies in other plugins?
+# Use the price system and the name of the currency as the ID,
+# read more here: https://plugins.auxilor.io/all-plugins/prices
+
+# Placeholders:
+# %ecobits_<id>% - The balance of a certain currency
+# %ecobits_<id>_formatted% - The formatted balance of a certain currency
+# %ecobits_<id>_max% - The max balance of a certain currency
+# %ecobits_<id>_default% - The default balance of a certain currency
+# %ecobits_<id>_name% - The display name of a certain currency
+
 currencies:
   - id: crystals # The ID of the currency.
     name: "&bCrystals ❖" # The name of the currency.
     default: 0 # The default balance.
     max: -1 # The maximum balance, set to -1 if no max.
+    payable: false # If players should be able to use /ecobits pay to pay other players
+    decimal: true # If decimal amounts are allowed rather than just integer amounts

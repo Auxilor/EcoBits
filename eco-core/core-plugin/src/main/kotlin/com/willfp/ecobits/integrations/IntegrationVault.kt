@@ -42,6 +42,7 @@ class IntegrationVault(
         return currency.name
     }
 
+    @Deprecated("Deprecated in Java")
     override fun hasAccount(playerName: String): Boolean {
         val player = Bukkit.getOfflinePlayer(playerName)
 
@@ -52,6 +53,7 @@ class IntegrationVault(
         return player.hasPlayedBefore() || player.isOnline
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("hasAccount(playerName)"))
     override fun hasAccount(playerName: String, worldName: String): Boolean {
         return hasAccount(playerName)
     }
@@ -60,6 +62,10 @@ class IntegrationVault(
         return hasAccount(player)
     }
 
+    @Deprecated(
+        "Deprecated in Java",
+        ReplaceWith("getBalance(Bukkit.getOfflinePlayer(playerName))", "org.bukkit.Bukkit")
+    )
     override fun getBalance(playerName: String): Double {
         return getBalance(Bukkit.getOfflinePlayer(playerName))
     }
@@ -68,10 +74,7 @@ class IntegrationVault(
         return player.getBalance(currency)
     }
 
-    private fun getDoubleValue(value: BigDecimal): Double {
-        return value.toDouble()
-    }
-
+    @Deprecated("Deprecated in Java", ReplaceWith("getBalance(playerName)"))
     override fun getBalance(playerName: String, world: String): Double {
         return getBalance(playerName)
     }
@@ -80,6 +83,10 @@ class IntegrationVault(
         return getBalance(player)
     }
 
+    @Deprecated(
+        "Deprecated in Java",
+        ReplaceWith("has(Bukkit.getOfflinePlayer(playerName), amount)", "org.bukkit.Bukkit")
+    )
     override fun has(playerName: String, amount: Double): Boolean {
         return has(Bukkit.getOfflinePlayer(playerName), amount)
     }
@@ -88,6 +95,7 @@ class IntegrationVault(
         return player.getBalance(currency) >= amount
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("has(playerName, amount)"))
     override fun has(playerName: String, worldName: String, amount: Double): Boolean {
         return has(playerName, amount)
     }
@@ -96,6 +104,10 @@ class IntegrationVault(
         return has(player, amount)
     }
 
+    @Deprecated(
+        "Deprecated in Java",
+        ReplaceWith("withdrawPlayer(Bukkit.getOfflinePlayer(playerName), amount)", "org.bukkit.Bukkit")
+    )
     override fun withdrawPlayer(playerName: String, amount: Double): EconomyResponse {
         return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), amount)
     }
@@ -128,6 +140,7 @@ class IntegrationVault(
         )
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("withdrawPlayer(playerName, amount)"))
     override fun withdrawPlayer(playerName: String, worldName: String, amount: Double): EconomyResponse {
         return withdrawPlayer(playerName, amount)
     }
@@ -136,6 +149,10 @@ class IntegrationVault(
         return withdrawPlayer(player, amount)
     }
 
+    @Deprecated(
+        "Deprecated in Java",
+        ReplaceWith("depositPlayer(Bukkit.getOfflinePlayer(playerName), amount)", "org.bukkit.Bukkit")
+    )
     override fun depositPlayer(playerName: String, amount: Double): EconomyResponse {
         return depositPlayer(Bukkit.getOfflinePlayer(playerName), amount)
     }
@@ -167,6 +184,7 @@ class IntegrationVault(
         )
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("depositPlayer(playerName, amount)"))
     override fun depositPlayer(playerName: String, worldName: String, amount: Double): EconomyResponse {
         return depositPlayer(playerName, amount)
     }
@@ -175,6 +193,10 @@ class IntegrationVault(
         return depositPlayer(player, amount)
     }
 
+    @Deprecated(
+        "Deprecated in Java",
+        ReplaceWith("createPlayerAccount(Bukkit.getOfflinePlayer(playerName))", "org.bukkit.Bukkit")
+    )
     override fun createPlayerAccount(playerName: String): Boolean {
         return createPlayerAccount(Bukkit.getOfflinePlayer(playerName))
     }
@@ -183,6 +205,7 @@ class IntegrationVault(
         return false
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("false"))
     override fun createPlayerAccount(playerName: String, worldName: String): Boolean {
         return false
     }
@@ -191,6 +214,13 @@ class IntegrationVault(
         return false
     }
 
+    @Deprecated(
+        "Deprecated in Java", ReplaceWith(
+            "EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, \"EcoBits doesn't support bank accounts!\")",
+            "net.milkbowl.vault.economy.EconomyResponse",
+            "net.milkbowl.vault.economy.EconomyResponse"
+        )
+    )
     override fun createBank(name: String, player: String): EconomyResponse {
         return EconomyResponse(
             0.0,
@@ -254,6 +284,13 @@ class IntegrationVault(
         )
     }
 
+    @Deprecated(
+        "Deprecated in Java", ReplaceWith(
+            "EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, \"EcoBits doesn't support bank accounts!\")",
+            "net.milkbowl.vault.economy.EconomyResponse",
+            "net.milkbowl.vault.economy.EconomyResponse"
+        )
+    )
     override fun isBankOwner(name: String, playerName: String): EconomyResponse {
         return EconomyResponse(
             0.0,
@@ -272,6 +309,13 @@ class IntegrationVault(
         )
     }
 
+    @Deprecated(
+        "Deprecated in Java", ReplaceWith(
+            "EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, \"EcoBits doesn't support bank accounts!\")",
+            "net.milkbowl.vault.economy.EconomyResponse",
+            "net.milkbowl.vault.economy.EconomyResponse"
+        )
+    )
     override fun isBankMember(name: String, playerName: String): EconomyResponse {
         return EconomyResponse(
             0.0,

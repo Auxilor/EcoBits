@@ -32,6 +32,7 @@ permissions:
       ecobits.command.set: true
       ecobits.command.reset: true
       ecobits.command.pay: true
+      ecobits.command.take: true
       ecobits.command.balance: true
 
   ecobits.command.reload:
@@ -39,6 +40,9 @@ permissions:
     default: op
   ecobits.command.give:
     description: Gives a currency
+    default: op
+  ecobits.command.take:
+    description: Takes a currency
     default: op
   ecobits.command.givesilent:
     description: Gives a currency silently

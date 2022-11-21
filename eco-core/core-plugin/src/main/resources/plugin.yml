@@ -8,8 +8,8 @@ load: STARTUP
 depend:
   - eco
   - ProtocolLib
+softdepend:
   - Vault
-softdepend: []
 commands:
   ecobits:
     description: Base Command

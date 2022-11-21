@@ -21,3 +21,5 @@ currencies:
     max: -1 # The maximum balance, set to -1 if no max.
     payable: false # If players should be able to use /ecobits pay to pay other players
     decimal: true # If decimal amounts are allowed rather than just integer amounts
+
+    vault: true # If this currency should be registered with vault

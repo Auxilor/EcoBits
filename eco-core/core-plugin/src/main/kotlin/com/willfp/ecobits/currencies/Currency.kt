@@ -12,7 +12,11 @@ import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
 import com.willfp.eco.util.toNiceString
+import com.willfp.ecobits.integrations.IntegrationVault
+import net.milkbowl.vault.economy.Economy
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
+import org.bukkit.plugin.ServicePriority
 import java.text.DecimalFormat
 import kotlin.math.floor
 import kotlin.math.log10
@@ -37,6 +41,8 @@ class Currency(
     val isPayable = config.getBool("payable")
 
     val isDecimal = config.getBool("decimal")
+
+    val isRegisteredWithVault = config.getBool("vault")
 
     init {
         PlaceholderManager.registerPlaceholder(
@@ -76,6 +82,15 @@ class Currency(
         )
 
         Prices.registerPriceFactory(PriceFactoryCurrency(this))
+
+        if (isRegisteredWithVault) {
+            Bukkit.getServer().servicesManager.register(
+                Economy::class.java,
+                IntegrationVault(this),
+                plugin,
+                ServicePriority.Normal
+            )
+        }
     }
 }
 

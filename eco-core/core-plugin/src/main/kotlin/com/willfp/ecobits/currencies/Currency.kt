@@ -83,7 +83,7 @@ class Currency(
 
         Prices.registerPriceFactory(PriceFactoryCurrency(this))
 
-        if (isRegisteredWithVault) {
+        if (isRegisteredWithVault && IntegrationVault.isVaultPresent) {
             Bukkit.getServer().servicesManager.register(
                 Economy::class.java,
                 IntegrationVault(this),

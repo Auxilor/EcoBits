@@ -8,7 +8,6 @@ import net.milkbowl.vault.economy.Economy
 import net.milkbowl.vault.economy.EconomyResponse
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import java.math.BigDecimal
 
 @Suppress("DEPRECATION")
 class IntegrationVault(
@@ -336,5 +335,10 @@ class IntegrationVault(
 
     override fun getBanks(): MutableList<String> {
         return mutableListOf()
+    }
+
+    companion object {
+        var isVaultPresent: Boolean = false
+            internal set
     }
 }

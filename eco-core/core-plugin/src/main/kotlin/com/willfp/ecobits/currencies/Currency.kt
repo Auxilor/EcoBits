@@ -13,6 +13,10 @@ import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
 import com.willfp.eco.util.toNiceString
 import org.bukkit.OfflinePlayer
+import java.text.DecimalFormat
+import kotlin.math.floor
+import kotlin.math.log10
+import kotlin.math.pow
 
 class Currency(
     val id: String,
@@ -40,7 +44,7 @@ class Currency(
                 plugin,
                 id
             ) {
-                it.getBalance(this).toString()
+                it.getBalance(this).toNiceString()
             }
         )
 
@@ -49,7 +53,7 @@ class Currency(
                 plugin,
                 "${id}_formatted"
             ) {
-                it.getBalance(this).toNiceString()
+                it.getBalance(this).formatWithExtension()
             }
         )
 
@@ -72,6 +76,20 @@ class Currency(
         )
 
         Prices.registerPriceFactory(PriceFactoryCurrency(this))
+    }
+}
+
+fun Double.formatWithExtension(): String {
+    val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')
+    val numValue = this.toLong()
+    val value = floor(log10(numValue.toDouble())).toInt()
+
+    val base = value / 3
+
+    return if (value >= 3 && base < suffix.size) {
+        DecimalFormat("#0.0").format(numValue / 10.0.pow((base * 3).toDouble())) + suffix[base]
+    } else {
+        DecimalFormat("#,##0").format(numValue)
     }
 }
 

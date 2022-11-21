@@ -88,7 +88,7 @@ class Currency(
                 Economy::class.java,
                 IntegrationVault(this),
                 plugin,
-                ServicePriority.Normal
+                ServicePriority.Highest
             )
         }
     }

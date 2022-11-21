@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://i.imgur.com/0fHAc09.png" alt="EcoBits logo" width="256">
+  <img src="https://i.imgur.com/1GHRdhQ.png" alt="EcoBits logo" width="256">
   <br>
 </h1>
 
@@ -20,8 +20,6 @@
         <img src="https://img.shields.io/discord/452518336627081236?label=discord&style=for-the-badge&color=9efaff"/>
     </a>
 </p>
-
-[![Docs](https://i.imgur.com/rhb2yxd.png)](https://discord.gg/ZcwpSsE/)
 
 ## License
 *Click here to read [the entire license](https://github.com/Auxilor/EcoBits/blob/master/LICENSE.md).*

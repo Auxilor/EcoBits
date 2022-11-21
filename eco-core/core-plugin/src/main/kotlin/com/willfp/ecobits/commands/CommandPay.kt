@@ -32,7 +32,7 @@ class CommandPay(
         @Suppress("DEPRECATION")
         val recipient = Bukkit.getOfflinePlayer(args[0])
 
-        if (!recipient.hasPlayedBefore() && !recipient.isOnline) {
+        if ((!recipient.hasPlayedBefore() && !recipient.isOnline) || (recipient.uniqueId == player.uniqueId)) {
             player.sendMessage(plugin.langYml.getMessage("invalid-player"))
             return
         }

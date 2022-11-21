@@ -1,6 +1,5 @@
 package com.willfp.ecobits
 
-import com.sun.tools.javac.jvm.ByteCodes.ret
 import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.PluginCommand
 import com.willfp.eco.core.integrations.IntegrationLoader

@@ -1,0 +1,47 @@
+name: EcoBits
+version: ${projectVersion}
+main: com.willfp.ecobits.EcoBitsPlugin
+api-version: 1.17
+authors: [ Auxilor ]
+website: willfp.com
+load: STARTUP
+depend:
+  - eco
+  - ProtocolLib
+softdepend: []
+commands:
+  ecobits:
+    description: Base Command
+    permission: ecobits.command.ecobits
+
+permissions:
+  ecobits.*:
+    description: All EcoBits permissions
+    default: op
+    children:
+      ecobits.command.*: true
+  ecobits.command.*:
+    description: All commands
+    default: op
+    children:
+      ecobits.command.reload: true
+      ecobits.command.give: true
+      ecobits.command.get: true
+      ecobits.command.set: true
+      ecobits.command.reset: true
+
+  ecobits.command.reload:
+    description: Allows reloading the config
+    default: op
+  ecobits.command.give:
+    description: Gives a currency
+    default: op
+  ecobits.command.get:
+    description: Gets a currency
+    default: op
+  ecobits.command.set:
+    description: Sets a currency
+    default: op
+  ecobits.command.reset:
+    description: Resets a currency
+    default: op

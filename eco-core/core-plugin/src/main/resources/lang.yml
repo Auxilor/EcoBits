@@ -1,0 +1,15 @@
+messages:
+  prefix: "&#9efaff&lEcoBits&r &8» &r"
+  no-permission: "&cYou don't have permission to do this!"
+  not-player: "&cThis command must be run by a player"
+  invalid-command: "&cUnknown subcommand!"
+  reloaded: "Reloaded!"
+
+  must-specify-currency: "&cYou must specify a currency!"
+  invalid-currency: "&cInvalid currency!"
+  must-specify-amount: "&cYou must specify an amount!"
+  invalid-amount: "&cInvalid amount!"
+  set-currency: "&fSet %player%&r to have &a%amount%&r &f%currency%&f!"
+  reset-currency: "&fReset %player%&r to have &a%amount%&r &f%currency%&f!"
+  gave-currency: "&fGave %player%&r &a%amount%&r &f%currency%&f!"
+  balance: "&f%player%&f has &a%amount%&r &f%currency%&f!"

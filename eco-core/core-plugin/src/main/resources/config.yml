@@ -1,0 +1,10 @@
+#
+# EcoBits
+# by Auxilor
+#
+
+currencies:
+  - id: crystals # The ID of the currency.
+    name: "&bCrystals ❖" # The name of the currency.
+    default: 0 # The default balance.
+    max: -1 # The maximum balance, set to -1 if no max.

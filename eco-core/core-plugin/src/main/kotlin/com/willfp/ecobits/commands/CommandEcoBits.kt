@@ -8,6 +8,7 @@ class CommandEcoBits(plugin: EcoPlugin) : PluginCommand(plugin, "ecobits", "ecob
     init {
         this.addSubcommand(CommandReload(plugin))
             .addSubcommand(CommandGive(plugin))
+            .addSubcommand(CommandGivesilent(plugin))
             .addSubcommand(CommandGet(plugin))
             .addSubcommand(CommandSet(plugin))
             .addSubcommand(CommandReset(plugin))

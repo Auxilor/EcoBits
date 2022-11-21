@@ -26,6 +26,7 @@ permissions:
     children:
       ecobits.command.reload: true
       ecobits.command.give: true
+      ecobits.command.givesilent: true
       ecobits.command.get: true
       ecobits.command.set: true
       ecobits.command.reset: true
@@ -35,6 +36,9 @@ permissions:
     default: op
   ecobits.command.give:
     description: Gives a currency
+    default: op
+  ecobits.command.givesilent:
+    description: Gives a currency silently
     default: op
   ecobits.command.get:
     description: Gets a currency

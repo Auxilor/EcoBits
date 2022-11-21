@@ -8,16 +8,16 @@
 
 <p align="center">
     <a href="https://polymart.org/resource/ecobits.1351">
-        <img alt="spigot" src="https://img.shields.io/badge/polymart-EcoBits-2d2d2d?style=for-the-badge"/>
+        <img alt="spigot" src="https://img.shields.io/badge/polymart-EcoBits-9efaff?style=for-the-badge"/>
     </a>
     <a href="https://bstats.org/plugin/bukkit/EcoBits" alt="bstats servers">
-        <img src="https://img.shields.io/bstats/servers/16436?color=2d2d2d&style=for-the-badge"/>
+        <img src="https://img.shields.io/bstats/servers/16908?color=9efaff&style=for-the-badge"/>
     </a>
     <a href="https://bstats.org/plugin/bukkit/EcoBits" alt="bstats players">
-        <img src="https://img.shields.io/bstats/players/16436?color=2d2d2d&style=for-the-badge"/>
+        <img src="https://img.shields.io/bstats/players/16908?color=9efaff&style=for-the-badge"/>
     </a>
     <a href="https://discord.gg/ZcwpSsE/" alt="Discord">
-        <img src="https://img.shields.io/discord/452518336627081236?label=discord&style=for-the-badge&color=2d2d2d"/>
+        <img src="https://img.shields.io/discord/452518336627081236?label=discord&style=for-the-badge&color=9efaff"/>
     </a>
 </p>
 

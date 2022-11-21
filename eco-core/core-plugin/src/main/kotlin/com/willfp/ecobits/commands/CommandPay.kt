@@ -71,6 +71,11 @@ class CommandPay(
             return
         }
 
+        if (recipient.getBalance(currency) + amount > currency.max) {
+            player.sendMessage(plugin.langYml.getMessage("too-much"))
+            return
+        }
+
         recipient.adjustBalance(currency, amount)
         player.adjustBalance(currency, -amount)
 

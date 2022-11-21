@@ -16,3 +16,4 @@ messages:
   balance: "You have &a%amount%&r &f%currency%&f!"
   cannot-afford: "&cYou can't afford to do this!"
   paid-player: "&fYou paid %player%&r &a%amount%&r &f%currency%&f!"
+  too-much: "&fYou can't pay %player%&r this many &f%currency%&f as they already have too many!"

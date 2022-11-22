@@ -8,6 +8,8 @@ import com.willfp.ecobits.integrations.IntegrationVault
 import org.bukkit.event.Listener
 
 class EcoBitsPlugin : EcoPlugin() {
+    val serverID = configYml.getString("server-id")
+
     init {
         instance = this
     }

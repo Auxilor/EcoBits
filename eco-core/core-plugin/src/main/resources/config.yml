@@ -14,6 +14,8 @@
 # %ecobits_<id>_default% - The default balance of a certain currency
 # %ecobits_<id>_name% - The display name of a certain currency
 
+server-id: "main" # Server ID for local currencies over MySQL/MongoDB.
+
 currencies:
   - id: crystals # The ID of the currency.
     name: "&bCrystals ❖" # The name of the currency.
@@ -22,3 +24,4 @@ currencies:
     payable: false # If players should be able to use /ecobits pay to pay other players
     decimal: true # If decimal amounts are allowed rather than just integer amounts
     vault: false # If this currency should be registered with vault
+    local: false # If this currency should not sync between servers

@@ -2,7 +2,6 @@
 
 package com.willfp.ecobits.currencies
 
-import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
@@ -12,6 +11,7 @@ import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
 import com.willfp.eco.util.toNiceString
+import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.integrations.IntegrationVault
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
@@ -24,16 +24,10 @@ import kotlin.math.pow
 
 class Currency(
     val id: String,
-    val plugin: EcoPlugin,
+    val plugin: EcoBitsPlugin,
     val config: Config
 ) {
     val default = config.getDouble("default")
-
-    val key = PersistentDataKey(
-        plugin.createNamespacedKey(id),
-        PersistentDataKeyType.DOUBLE,
-        default
-    )
 
     val name = config.getFormattedString("name")
     val max = config.getDouble("max").let { if (it < 0) Double.MAX_VALUE else it }
@@ -43,6 +37,14 @@ class Currency(
     val isDecimal = config.getBool("decimal")
 
     val isRegisteredWithVault = config.getBool("vault")
+
+    val isLocal = config.getBool("local")
+
+    val key = PersistentDataKey(
+        plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),
+        PersistentDataKeyType.DOUBLE,
+        default
+    )
 
     init {
         PlaceholderManager.registerPlaceholder(

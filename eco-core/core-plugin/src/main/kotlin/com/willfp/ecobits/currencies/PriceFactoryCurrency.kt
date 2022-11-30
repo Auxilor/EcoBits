@@ -6,7 +6,6 @@ import com.willfp.eco.core.price.PriceFactory
 import org.bukkit.entity.Player
 import java.util.UUID
 import java.util.function.Function
-import kotlin.math.roundToInt
 
 class PriceFactoryCurrency(
     private val currency: Currency
@@ -26,19 +25,17 @@ class PriceFactoryCurrency(
     ) : Price {
         private val multipliers = mutableMapOf<UUID, Double>()
 
-        override fun canAfford(player: Player) = player.getBalance(currency) >= getValue(player)
+        override fun canAfford(player: Player, multiplier: Double) =
+            player.getBalance(currency) >= getValue(player, multiplier)
 
-        override fun pay(player: Player) {
-            player.adjustBalance(currency, -getValue(player))
-        }
+        override fun pay(player: Player, multiplier: Double) =
+            player.adjustBalance(currency, -getValue(player, multiplier))
 
-        override fun giveTo(player: Player) {
-            player.adjustBalance(currency, getValue(player))
-        }
+        override fun giveTo(player: Player, multiplier: Double) =
+            player.adjustBalance(currency, getValue(player, multiplier))
 
-        override fun getValue(player: Player): Double {
-            return xp(MathContext.copyWithPlayer(baseContext, player)) * getMultiplier(player)
-        }
+        override fun getValue(player: Player, multiplier: Double) =
+            xp(MathContext.copyWithPlayer(baseContext, player)) * getMultiplier(player) * multiplier
 
         override fun getMultiplier(player: Player): Double {
             return multipliers[player.uniqueId] ?: 1.0

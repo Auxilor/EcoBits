@@ -2,6 +2,7 @@ package com.willfp.ecobits.commands
 
 import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.Subcommand
+import com.willfp.eco.core.data.PlayerProfile
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString

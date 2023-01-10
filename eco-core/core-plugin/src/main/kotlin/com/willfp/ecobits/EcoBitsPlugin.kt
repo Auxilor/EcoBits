@@ -5,6 +5,7 @@ import com.willfp.eco.core.command.impl.PluginCommand
 import com.willfp.eco.core.integrations.IntegrationLoader
 import com.willfp.ecobits.commands.CommandEcoBits
 import com.willfp.ecobits.integrations.IntegrationVault
+import com.willfp.ecobits.placeholders.EcoBitsTopExpansion
 import org.bukkit.event.Listener
 
 class EcoBitsPlugin : EcoPlugin() {
@@ -26,7 +27,8 @@ class EcoBitsPlugin : EcoPlugin() {
 
     override fun loadIntegrationLoaders(): List<IntegrationLoader> {
         return listOf(
-            IntegrationLoader("Vault") { IntegrationVault.isVaultPresent = true }
+            IntegrationLoader("Vault") { IntegrationVault.isVaultPresent = true },
+            IntegrationLoader("PlaceholderAPI") { EcoBitsTopExpansion(this).register() }
         )
     }
 

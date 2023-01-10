@@ -2,6 +2,8 @@
 
 package com.willfp.ecobits.currencies
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
@@ -18,6 +20,7 @@ import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.text.DecimalFormat
+import java.time.Duration
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -27,6 +30,10 @@ class Currency(
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
+    val leaderBoardCache: Cache<Int, LeaderboardCacheEntry?> = Caffeine.newBuilder()
+        .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("cache-expire-after").toLong()))
+        .build()
+
     val default = config.getDouble("default")
 
     val name = config.getFormattedString("name")
@@ -45,6 +52,17 @@ class Currency(
         PersistentDataKeyType.DOUBLE,
         default
     )
+
+    fun getTop(place: Int): LeaderboardCacheEntry? {
+        return leaderBoardCache.get(place) {
+            val top = Bukkit.getOfflinePlayers()
+                .sortedByDescending { it.getBalance(this) }.getOrNull(place - 1)
+
+            if (top == null) {
+                null
+            } else LeaderboardCacheEntry(top, top.getBalance(this))
+        }
+    }
 
     init {
         PlaceholderManager.registerPlaceholder(
@@ -95,6 +113,8 @@ class Currency(
         }
     }
 }
+
+data class LeaderboardCacheEntry(val player: OfflinePlayer, val amount: Double)
 
 fun Double.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')

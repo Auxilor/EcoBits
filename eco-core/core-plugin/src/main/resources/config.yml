@@ -16,6 +16,8 @@
 
 server-id: "main" # Server ID for local currencies over MySQL/MongoDB.
 
+cache-expire-after: 300 # Leaderboard cache expire time in seconds.
+
 currencies:
   - id: crystals # The ID of the currency.
     name: "&bCrystals ❖" # The name of the currency.

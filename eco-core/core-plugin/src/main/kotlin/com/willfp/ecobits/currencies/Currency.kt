@@ -9,9 +9,12 @@ import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
+import com.willfp.eco.core.placeholder.DynamicPlaceholder
+import com.willfp.eco.core.placeholder.PlayerDynamicPlaceholder
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
+import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.integrations.IntegrationVault
@@ -21,6 +24,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.text.DecimalFormat
 import java.time.Duration
+import java.util.regex.Pattern
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -65,6 +69,28 @@ class Currency(
     }
 
     init {
+        PlaceholderManager.registerPlaceholder(
+            DynamicPlaceholder(
+                plugin,
+                Pattern.compile("top_${id}_[0-9]+_[a-z]+"),
+            ) {
+                value ->
+                val place = value.split("_").getOrNull(2)
+                    ?.toIntOrNull() ?: return@DynamicPlaceholder "Invalid place"
+                val type = value.split("_").getOrNull(3)
+                    ?: return@DynamicPlaceholder "Type required"
+                return@DynamicPlaceholder when(type) {
+                    "name" -> this.getTop(place)?.player?.savedDisplayName
+                        ?: plugin.langYml.getFormattedString("top.name-empty")
+
+                    "amount" -> this.getTop(place)?.amount?.formatWithExtension()
+                        ?: plugin.langYml.getFormattedString("top.amount-empty")
+
+                    else -> "Invalid type"
+                }
+            }
+        )
+
         PlaceholderManager.registerPlaceholder(
             PlayerPlaceholder(
                 plugin,

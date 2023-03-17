@@ -2,14 +2,19 @@
 
 package com.willfp.ecobits.currencies
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
+import com.willfp.eco.core.placeholder.DynamicPlaceholder
+import com.willfp.eco.core.placeholder.PlayerDynamicPlaceholder
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
+import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.integrations.IntegrationVault
@@ -18,6 +23,8 @@ import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.text.DecimalFormat
+import java.time.Duration
+import java.util.regex.Pattern
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -27,6 +34,10 @@ class Currency(
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
+    val leaderBoardCache: Cache<Int, LeaderboardCacheEntry?> = Caffeine.newBuilder()
+        .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("cache-expire-after").toLong()))
+        .build()
+
     val default = config.getDouble("default")
 
     val name = config.getFormattedString("name")
@@ -46,7 +57,40 @@ class Currency(
         default
     )
 
+    fun getTop(place: Int): LeaderboardCacheEntry? {
+        return leaderBoardCache.get(place) {
+            val top = Bukkit.getOfflinePlayers()
+                .sortedByDescending { it.getBalance(this) }.getOrNull(place - 1)
+
+            if (top == null) {
+                null
+            } else LeaderboardCacheEntry(top, top.getBalance(this))
+        }
+    }
+
     init {
+        PlaceholderManager.registerPlaceholder(
+            DynamicPlaceholder(
+                plugin,
+                Pattern.compile("top_${id}_[0-9]+_[a-z]+"),
+            ) {
+                value ->
+                val place = value.split("_").getOrNull(2)
+                    ?.toIntOrNull() ?: return@DynamicPlaceholder "Invalid place"
+                val type = value.split("_").getOrNull(3)
+                    ?: return@DynamicPlaceholder "Type required"
+                return@DynamicPlaceholder when(type) {
+                    "name" -> this.getTop(place)?.player?.savedDisplayName
+                        ?: plugin.langYml.getFormattedString("top.name-empty")
+
+                    "amount" -> this.getTop(place)?.amount?.formatWithExtension()
+                        ?: plugin.langYml.getFormattedString("top.amount-empty")
+
+                    else -> "Invalid type"
+                }
+            }
+        )
+
         PlaceholderManager.registerPlaceholder(
             PlayerPlaceholder(
                 plugin,
@@ -95,6 +139,8 @@ class Currency(
         }
     }
 }
+
+data class LeaderboardCacheEntry(val player: OfflinePlayer, val amount: Double)
 
 fun Double.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')

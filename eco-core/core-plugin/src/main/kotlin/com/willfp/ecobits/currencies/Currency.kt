@@ -2,7 +2,6 @@
 
 package com.willfp.ecobits.currencies
 
-import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
@@ -10,7 +9,6 @@ import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.DynamicPlaceholder
-import com.willfp.eco.core.placeholder.PlayerDynamicPlaceholder
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
@@ -24,6 +22,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.text.DecimalFormat
 import java.time.Duration
+import java.util.Optional
 import java.util.regex.Pattern
 import kotlin.math.floor
 import kotlin.math.log10
@@ -34,9 +33,9 @@ class Currency(
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
-    val leaderBoardCache: Cache<Int, LeaderboardCacheEntry?> = Caffeine.newBuilder()
+    val leaderboardCache = Caffeine.newBuilder()
         .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("cache-expire-after").toLong()))
-        .build()
+        .build<Int, Optional<LeaderboardPlace>>()
 
     val default = config.getDouble("default")
 
@@ -57,15 +56,15 @@ class Currency(
         default
     )
 
-    fun getTop(place: Int): LeaderboardCacheEntry? {
-        return leaderBoardCache.get(place) {
+    fun getLeaderboardPlace(place: Int): LeaderboardPlace? {
+        return leaderboardCache.get(place) {
             val top = Bukkit.getOfflinePlayers()
                 .sortedByDescending { it.getBalance(this) }.getOrNull(place - 1)
 
             if (top == null) {
-                null
-            } else LeaderboardCacheEntry(top, top.getBalance(this))
-        }
+                Optional.empty()
+            } else Optional.of(LeaderboardPlace(top, top.getBalance(this)))
+        }.orElse(null)
     }
 
     init {
@@ -73,20 +72,21 @@ class Currency(
             DynamicPlaceholder(
                 plugin,
                 Pattern.compile("top_${id}_[0-9]+_[a-z]+"),
-            ) {
-                value ->
+            ) { value ->
                 val place = value.split("_").getOrNull(2)
-                    ?.toIntOrNull() ?: return@DynamicPlaceholder "Invalid place"
+                    ?.toIntOrNull() ?: return@DynamicPlaceholder ""
+
                 val type = value.split("_").getOrNull(3)
-                    ?: return@DynamicPlaceholder "Type required"
-                return@DynamicPlaceholder when(type) {
-                    "name" -> this.getTop(place)?.player?.savedDisplayName
+                    ?: return@DynamicPlaceholder ""
+
+                return@DynamicPlaceholder when (type) {
+                    "name" -> this.getLeaderboardPlace(place)?.player?.savedDisplayName
                         ?: plugin.langYml.getFormattedString("top.name-empty")
 
-                    "amount" -> this.getTop(place)?.amount?.formatWithExtension()
+                    "amount" -> this.getLeaderboardPlace(place)?.amount?.formatWithExtension()
                         ?: plugin.langYml.getFormattedString("top.amount-empty")
 
-                    else -> "Invalid type"
+                    else -> ""
                 }
             }
         )
@@ -140,7 +140,10 @@ class Currency(
     }
 }
 
-data class LeaderboardCacheEntry(val player: OfflinePlayer, val amount: Double)
+data class LeaderboardPlace(
+    val player: OfflinePlayer,
+    val amount: Double
+)
 
 fun Double.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')

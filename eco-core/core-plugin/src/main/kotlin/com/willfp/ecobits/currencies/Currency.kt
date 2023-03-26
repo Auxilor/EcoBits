@@ -71,7 +71,7 @@ class Currency(
         PlaceholderManager.registerPlaceholder(
             DynamicPlaceholder(
                 plugin,
-                Pattern.compile("top_${id}_[0-9]+_[a-z]+"),
+                Pattern.compile("top_${id}_[0-9]+_[a-z]+_?[a-z]*"),
             ) { value ->
                 val place = value.split("_").getOrNull(2)
                     ?.toIntOrNull() ?: return@DynamicPlaceholder ""
@@ -79,11 +79,16 @@ class Currency(
                 val type = value.split("_").getOrNull(3)
                     ?: return@DynamicPlaceholder ""
 
+                val raw = value.split("_").getOrNull(4)
+                    ?.equals("raw", true) ?: true
+
+                val placeObj = getLeaderboardPlace(place)
+
                 return@DynamicPlaceholder when (type) {
-                    "name" -> this.getLeaderboardPlace(place)?.player?.savedDisplayName
+                    "name" -> placeObj?.player?.savedDisplayName
                         ?: plugin.langYml.getFormattedString("top.name-empty")
 
-                    "amount" -> this.getLeaderboardPlace(place)?.amount?.formatWithExtension()
+                    "amount" -> (if (raw) placeObj?.amount.toNiceString() else placeObj?.amount?.formatWithExtension())
                         ?: plugin.langYml.getFormattedString("top.amount-empty")
 
                     else -> ""

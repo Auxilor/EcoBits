@@ -15,6 +15,7 @@ import com.willfp.eco.core.price.Prices
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.EcoBitsPlugin
+import com.willfp.ecobits.commands.DynamicCurrencyCommand
 import com.willfp.ecobits.integrations.IntegrationVault
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
@@ -40,6 +41,7 @@ class Currency(
     val default = config.getDouble("default")
 
     val name = config.getFormattedString("name")
+
     val max = config.getDouble("max").let { if (it < 0) Double.MAX_VALUE else it }
 
     val isPayable = config.getBool("payable")
@@ -49,6 +51,8 @@ class Currency(
     val isRegisteredWithVault = config.getBool("vault")
 
     val isLocal = config.getBool("local")
+
+    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(plugin, it, this) }
 
     val key = PersistentDataKey(
         plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),
@@ -65,6 +69,17 @@ class Currency(
                 Optional.empty()
             } else Optional.of(LeaderboardPlace(top, top.getBalance(this)))
         }.orElse(null)
+    }
+
+    fun registerCommands() {
+        this.commands.forEach {
+            println("Registered ${it.name}")
+            it.register()
+        }
+    }
+
+    fun unregisterCommands() {
+        this.commands.forEach { it.unregister() }
     }
 
     init {
@@ -142,6 +157,9 @@ class Currency(
                 ServicePriority.Highest
             )
         }
+
+        this.unregisterCommands()
+        this.registerCommands()
     }
 }
 

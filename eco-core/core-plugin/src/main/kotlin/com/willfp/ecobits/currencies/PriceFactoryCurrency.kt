@@ -1,13 +1,11 @@
 package com.willfp.ecobits.currencies
 
-import com.willfp.eco.core.math.MathContext
 import com.willfp.eco.core.placeholder.context.PlaceholderContext
 import com.willfp.eco.core.placeholder.context.PlaceholderContextSupplier
 import com.willfp.eco.core.price.Price
 import com.willfp.eco.core.price.PriceFactory
 import org.bukkit.entity.Player
 import java.util.UUID
-import java.util.function.Function
 
 class PriceFactoryCurrency(
     private val currency: Currency

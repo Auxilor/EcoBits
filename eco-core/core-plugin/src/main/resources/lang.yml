@@ -5,6 +5,8 @@ messages:
   invalid-command: "&cUnknown subcommand!"
   reloaded: "Reloaded!"
 
+  must-specify-player: "&cYou must specify a player!"
+  invalid-player: "&cInvalid player!"
   must-specify-currency: "&cYou must specify a currency!"
   invalid-currency: "&cInvalid currency!"
   must-specify-amount: "&cYou must specify an amount!"

@@ -2,7 +2,6 @@
 
 package com.willfp.ecobits.currencies
 
-import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
@@ -10,13 +9,13 @@ import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.DynamicPlaceholder
-import com.willfp.eco.core.placeholder.PlayerDynamicPlaceholder
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.EcoBitsPlugin
+import com.willfp.ecobits.commands.DynamicCurrencyCommand
 import com.willfp.ecobits.integrations.IntegrationVault
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
@@ -24,6 +23,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.text.DecimalFormat
 import java.time.Duration
+import java.util.Optional
 import java.util.regex.Pattern
 import kotlin.math.floor
 import kotlin.math.log10
@@ -34,13 +34,14 @@ class Currency(
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
-    val leaderBoardCache: Cache<Int, LeaderboardCacheEntry?> = Caffeine.newBuilder()
+    val leaderboardCache = Caffeine.newBuilder()
         .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("cache-expire-after").toLong()))
-        .build()
+        .build<Int, Optional<LeaderboardPlace>>()
 
     val default = config.getDouble("default")
 
     val name = config.getFormattedString("name")
+
     val max = config.getDouble("max").let { if (it < 0) Double.MAX_VALUE else it }
 
     val isPayable = config.getBool("payable")
@@ -51,42 +52,61 @@ class Currency(
 
     val isLocal = config.getBool("local")
 
+    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(plugin, it, this) }
+
     val key = PersistentDataKey(
         plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),
         PersistentDataKeyType.DOUBLE,
         default
     )
 
-    fun getTop(place: Int): LeaderboardCacheEntry? {
-        return leaderBoardCache.get(place) {
+    fun getLeaderboardPlace(place: Int): LeaderboardPlace? {
+        return leaderboardCache.get(place) {
             val top = Bukkit.getOfflinePlayers()
                 .sortedByDescending { it.getBalance(this) }.getOrNull(place - 1)
 
             if (top == null) {
-                null
-            } else LeaderboardCacheEntry(top, top.getBalance(this))
+                Optional.empty()
+            } else Optional.of(LeaderboardPlace(top, top.getBalance(this)))
+        }.orElse(null)
+    }
+
+    fun registerCommands() {
+        this.commands.forEach {
+            println("Registered ${it.name}")
+            it.register()
         }
+    }
+
+    fun unregisterCommands() {
+        this.commands.forEach { it.unregister() }
     }
 
     init {
         PlaceholderManager.registerPlaceholder(
             DynamicPlaceholder(
                 plugin,
-                Pattern.compile("top_${id}_[0-9]+_[a-z]+"),
-            ) {
-                value ->
+                Pattern.compile("top_${id}_[0-9]+_[a-z]+_?[a-z]*"),
+            ) { value ->
                 val place = value.split("_").getOrNull(2)
-                    ?.toIntOrNull() ?: return@DynamicPlaceholder "Invalid place"
+                    ?.toIntOrNull() ?: return@DynamicPlaceholder ""
+
                 val type = value.split("_").getOrNull(3)
-                    ?: return@DynamicPlaceholder "Type required"
-                return@DynamicPlaceholder when(type) {
-                    "name" -> this.getTop(place)?.player?.savedDisplayName
+                    ?: return@DynamicPlaceholder ""
+
+                val raw = value.split("_").getOrNull(4)
+                    ?.equals("raw", true) ?: true
+
+                val placeObj = getLeaderboardPlace(place)
+
+                return@DynamicPlaceholder when (type) {
+                    "name" -> placeObj?.player?.savedDisplayName
                         ?: plugin.langYml.getFormattedString("top.name-empty")
 
-                    "amount" -> this.getTop(place)?.amount?.formatWithExtension()
+                    "amount" -> (if (raw) placeObj?.amount.toNiceString() else placeObj?.amount?.formatWithExtension())
                         ?: plugin.langYml.getFormattedString("top.amount-empty")
 
-                    else -> "Invalid type"
+                    else -> ""
                 }
             }
         )
@@ -137,10 +157,16 @@ class Currency(
                 ServicePriority.Highest
             )
         }
+
+        this.unregisterCommands()
+        this.registerCommands()
     }
 }
 
-data class LeaderboardCacheEntry(val player: OfflinePlayer, val amount: Double)
+data class LeaderboardPlace(
+    val player: OfflinePlayer,
+    val amount: Double
+)
 
 fun Double.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')

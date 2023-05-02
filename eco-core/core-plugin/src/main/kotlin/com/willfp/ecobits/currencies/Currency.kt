@@ -71,14 +71,11 @@ class Currency(
         }.orElse(null)
     }
 
-    fun registerCommands() {
-        this.commands.forEach {
-            println("Registered ${it.name}")
-            it.register()
-        }
+    private fun registerCommands() {
+        this.commands.forEach { it.register() }
     }
 
-    fun unregisterCommands() {
+    private fun unregisterCommands() {
         this.commands.forEach { it.unregister() }
     }
 

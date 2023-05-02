@@ -6,13 +6,15 @@ import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
+import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.getBalance
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class CommandGet(
-    plugin: EcoPlugin
+    plugin: EcoPlugin,
+    private val currency: Currency? = null
 ) : Subcommand(
     plugin,
     "get",
@@ -33,12 +35,14 @@ class CommandGet(
             return
         }
 
-        if (args.size < 2) {
-            sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-            return
+        if (this.currency == null) {
+            if (args.size < 2) {
+                sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
+                return
+            }
         }
 
-        val currency = Currencies.getByID(args[1].lowercase())
+        val currency = this.currency ?: Currencies.getByID(args[1].lowercase())
 
         if (currency == null) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-currency"))
@@ -68,12 +72,14 @@ class CommandGet(
             )
         }
 
-        if (args.size == 2) {
-            StringUtil.copyPartialMatches(
-                args[1],
-                Currencies.values().map { it.id },
-                completions
-            )
+        if (this.currency == null) {
+            if (args.size == 2) {
+                StringUtil.copyPartialMatches(
+                    args[1],
+                    Currencies.values().map { it.id },
+                    completions
+                )
+            }
         }
 
         return completions

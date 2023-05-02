@@ -6,19 +6,23 @@ import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
+import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class CommandGive(
-    plugin: EcoPlugin
+    plugin: EcoPlugin,
+    private val currency: Currency? = null
 ) : Subcommand(
     plugin,
     "give",
     "ecobits.command.give",
     false
 ) {
+    private val argOffset = if (currency == null) 0 else -1
+
     override fun onExecute(sender: CommandSender, args: List<String>) {
         if (args.isEmpty()) {
             sender.sendMessage(plugin.langYml.getMessage("must-specify-player"))
@@ -33,24 +37,26 @@ class CommandGive(
             return
         }
 
-        if (args.size < 2) {
-            sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-            return
+        if (this.currency == null) {
+            if (args.size < 2) {
+                sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
+                return
+            }
         }
 
-        val currency = Currencies.getByID(args[1].lowercase())
+        val currency = this.currency ?: Currencies.getByID(args[1].lowercase())
 
         if (currency == null) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-currency"))
             return
         }
 
-        if (args.size < 3) {
+        if (args.size < 3 + argOffset) {
             sender.sendMessage(plugin.langYml.getMessage("must-specify-amount"))
             return
         }
 
-        val amount = args[2].toDoubleOrNull()
+        val amount = args[2 + argOffset].toDoubleOrNull()
 
         if (amount == null) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-amount"))
@@ -82,17 +88,19 @@ class CommandGive(
             )
         }
 
-        if (args.size == 2) {
-            StringUtil.copyPartialMatches(
-                args[1],
-                Currencies.values().map { it.id },
-                completions
-            )
+        if (this.currency == null) {
+            if (args.size == 2) {
+                StringUtil.copyPartialMatches(
+                    args[1],
+                    Currencies.values().map { it.id },
+                    completions
+                )
+            }
         }
 
-        if (args.size == 3) {
+        if (args.size == 3 + argOffset) {
             StringUtil.copyPartialMatches(
-                args[2],
+                args[2 + argOffset],
                 arrayOf(1, 2, 3, 4, 5).map { it.toString() },
                 completions
             )

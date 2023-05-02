@@ -15,89 +15,27 @@ class DynamicCurrencyCommand(
     plugin: EcoPlugin,
     label: String,
     val currency: Currency
-): PluginCommand(
+) : PluginCommand(
     plugin,
     label,
     "ecobits.command.${currency.id}",
     false
 ) {
     init {
-        DynamicCurrencySubcommand.allCommands.forEach {
-            this.addSubcommand(
-                DynamicCurrencySubcommand(plugin, it, currency)
-            )
-        }
+        this.addSubcommand(CommandGive(plugin, currency))
+            .addSubcommand(CommandGivesilent(plugin, currency))
+            .addSubcommand(CommandGet(plugin, currency))
+            .addSubcommand(CommandSet(plugin, currency))
+            .addSubcommand(CommandReset(plugin, currency))
+            .addSubcommand(CommandPay(plugin, currency))
+            .addSubcommand(CommandBalance(plugin, currency))
+            .addSubcommand(CommandTake(plugin, currency))
+            .addSubcommand(CommandTakesilent(plugin, currency))
     }
 
     override fun onExecute(sender: CommandSender, args: MutableList<String>) {
-        sender.sendMessage(this.plugin.langYml.getMessage("invalid-command"))
-    }
-
-
-    class DynamicCurrencySubcommand(
-        plugin: EcoPlugin,
-        val command: String,
-        val currency: Currency
-    ): Subcommand(
-        plugin,
-        command,
-        "ecobits.command.${currency.id}.$command",
-        false
-    ) {
-        override fun onExecute(sender: CommandSender, args: MutableList<String>) {
-            super.onExecute(sender, args)
-        }
-
-        override fun onExecute(sender: Player, args: MutableList<String>) {
-            val format = when {
-                currencyCommands.containsIgnoreCase(command) -> currencyFormat
-                playerCurrencyCommands.containsIgnoreCase(command) -> playerCurrencyFormat
-                playerCurrencyAmountCommands.containsIgnoreCase(command) -> playerCurrencyAmountFormat
-                else -> ""
-            }
-
-            Bukkit.dispatchCommand(sender,
-                format.replace(
-                    "%command%", command
-                ).replace(
-                    "%player%", args.getOrElse(0) { "" }
-                ).replace(
-                    "%amount%", args.getOrElse(1) { "" }
-                ).replace(
-                    "%currency%", currency.id
-                )
-            )
-        }
-
-        override fun tabComplete(sender: CommandSender, args: MutableList<String>): MutableList<String> {
-            return when {
-                args.size == 1 -> {
-                    if (currencyCommands.containsIgnoreCase(command)) {
-                        StringUtil.copyPartialMatches(args.first(),
-                            Currencies.values().map { it.id }, mutableListOf())
-                    } else {
-                        StringUtil.copyPartialMatches(args.first(),
-                            Bukkit.getOnlinePlayers().map { it.name }, mutableListOf())
-                    }
-                }
-
-                args.size == 2 && !currencyCommands.containsIgnoreCase(command) -> {
-                    StringUtil.copyPartialMatches(args.first(),
-                        Currencies.values().map { it.id }, mutableListOf())
-                }
-
-                else -> mutableListOf()
-            }
-        }
-
-        companion object {
-            val currencyCommands = listOf("balance")
-            val playerCurrencyCommands = listOf("get", "reset")
-            val playerCurrencyAmountCommands = listOf("give", "givesilent", "pay", "set", "take", "takesilent")
-            val allCommands = currencyCommands + playerCurrencyCommands + playerCurrencyAmountCommands
-            val currencyFormat = "ecobits %command% %currency%"
-            val playerCurrencyFormat = "ecobits %command% %player% %currency%"
-            val playerCurrencyAmountFormat = "ecobits %command% %player% %currency% %amount%"
-        }
+        sender.sendMessage(
+            plugin.langYml.getMessage("invalid-command")
+        )
     }
 }

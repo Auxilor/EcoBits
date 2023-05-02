@@ -13,7 +13,7 @@ import org.bukkit.util.StringUtil
 
 class CommandBalance(
     plugin: EcoPlugin,
-    currency: Currency? = null
+    private val currency: Currency? = null
 ) : Subcommand(
     plugin,
     "balance",
@@ -21,12 +21,14 @@ class CommandBalance(
     true
 ) {
     override fun onExecute(player: Player, args: List<String>) {
-        if (args.isEmpty()) {
-            player.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-            return
+        if (this.currency == null) {
+            if (args.isEmpty()) {
+                player.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
+                return
+            }
         }
 
-        val currency = Currencies.getByID(args[0].lowercase())
+        val currency = this.currency ?: Currencies.getByID(args[0].lowercase())
 
         if (currency == null) {
             player.sendMessage(plugin.langYml.getMessage("invalid-currency"))
@@ -43,16 +45,18 @@ class CommandBalance(
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {
         val completions = mutableListOf<String>()
 
-        if (args.isEmpty()) {
-            Currencies.values().map { it.id }
-        }
+        if (this.currency == null) {
+            if (args.isEmpty()) {
+                Currencies.values().map { it.id }
+            }
 
-        if (args.size == 1) {
-            StringUtil.copyPartialMatches(
-                args[0],
-                Currencies.values().map { it.id },
-                completions
-            )
+            if (args.size == 1) {
+                StringUtil.copyPartialMatches(
+                    args[0],
+                    Currencies.values().map { it.id },
+                    completions
+                )
+            }
         }
 
         return completions

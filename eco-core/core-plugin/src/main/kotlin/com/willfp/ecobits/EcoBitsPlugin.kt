@@ -30,6 +30,10 @@ class EcoBitsPlugin : EcoPlugin() {
         )
     }
 
+    override fun getMinimumEcoVersion(): String {
+        return "6.60.0"
+    }
+
     companion object {
         @JvmStatic
         lateinit var instance: EcoBitsPlugin

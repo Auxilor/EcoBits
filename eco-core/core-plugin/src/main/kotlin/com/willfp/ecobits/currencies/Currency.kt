@@ -21,6 +21,7 @@ import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
+import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.time.Duration
 import java.util.Optional
@@ -38,11 +39,11 @@ class Currency(
         .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("cache-expire-after").toLong()))
         .build<Int, Optional<LeaderboardPlace>>()
 
-    val default = config.getDouble("default")
+    val default = BigDecimal(config.getDouble("default"))
 
     val name = config.getFormattedString("name")
 
-    val max = config.getDouble("max").let { if (it < 0) Double.MAX_VALUE else it }
+    val max = BigDecimal(config.getDouble("max").let { if (it < 0) Double.POSITIVE_INFINITY else it })
 
     val isPayable = config.getBool("payable")
 
@@ -56,7 +57,7 @@ class Currency(
 
     val key = PersistentDataKey(
         plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),
-        PersistentDataKeyType.DOUBLE,
+        PersistentDataKeyType.BIG_DECIMAL,
         default
     )
 
@@ -162,10 +163,10 @@ class Currency(
 
 data class LeaderboardPlace(
     val player: OfflinePlayer,
-    val amount: Double
+    val amount: BigDecimal
 )
 
-fun Double.formatWithExtension(): String {
+fun BigDecimal.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')
     val numValue = this.toLong()
     val value = floor(log10(numValue.toDouble())).toInt()
@@ -179,17 +180,17 @@ fun Double.formatWithExtension(): String {
     }
 }
 
-fun OfflinePlayer.getBalance(currency: Currency): Double {
+fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {
     return this.profile.read(currency.key)
 }
 
-fun OfflinePlayer.setBalance(currency: Currency, value: Double) {
+fun OfflinePlayer.setBalance(currency: Currency, value: BigDecimal) {
     this.profile.write(
         currency.key,
-        value.coerceIn(0.0..currency.max)
+        value.coerceIn(BigDecimal(0.0)..currency.max)
     )
 }
 
-fun OfflinePlayer.adjustBalance(currency: Currency, by: Double) {
+fun OfflinePlayer.adjustBalance(currency: Currency, by: BigDecimal) {
     this.setBalance(currency, this.getBalance(currency) + by)
 }

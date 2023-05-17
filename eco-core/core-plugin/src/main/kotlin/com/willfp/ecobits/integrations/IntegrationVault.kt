@@ -30,7 +30,7 @@ class IntegrationVault(
     }
 
     override fun format(amount: Double): String {
-        return amount.formatWithExtension()
+        return amount.toBigDecimal().formatWithExtension()
     }
 
     override fun currencyNamePlural(): String {
@@ -70,7 +70,7 @@ class IntegrationVault(
     }
 
     override fun getBalance(player: OfflinePlayer): Double {
-        return player.getBalance(currency)
+        return player.getBalance(currency).toDouble()
     }
 
     @Deprecated("Deprecated in Java", ReplaceWith("getBalance(playerName)"))
@@ -91,7 +91,7 @@ class IntegrationVault(
     }
 
     override fun has(player: OfflinePlayer, amount: Double): Boolean {
-        return player.getBalance(currency) >= amount
+        return player.getBalance(currency).toDouble() >= amount
     }
 
     @Deprecated("Deprecated in Java", ReplaceWith("has(playerName, amount)"))
@@ -120,7 +120,7 @@ class IntegrationVault(
             return EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.FAILURE, "Can't withdraw below 0.")
         }
 
-        if (player.getBalance(currency) - amount < 0) {
+        if (player.getBalance(currency).toDouble() - amount < 0) {
             return EconomyResponse(
                 0.0,
                 0.0,
@@ -129,11 +129,11 @@ class IntegrationVault(
             )
         }
 
-        player.adjustBalance(currency, -amount)
+        player.adjustBalance(currency, -amount.toBigDecimal())
 
         return EconomyResponse(
             amount,
-            player.getBalance(currency),
+            player.getBalance(currency).toDouble(),
             EconomyResponse.ResponseType.SUCCESS,
             null
         )
@@ -165,7 +165,7 @@ class IntegrationVault(
             return EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.FAILURE, "Can't deposit below 0.")
         }
 
-        if (player.getBalance(currency) + amount > currency.max) {
+        if (player.getBalance(currency).toDouble() + amount > currency.max.toDouble()) {
             return EconomyResponse(
                 0.0,
                 0.0,
@@ -174,10 +174,10 @@ class IntegrationVault(
             )
         }
 
-        player.adjustBalance(currency, amount)
+        player.adjustBalance(currency, amount.toBigDecimal())
         return EconomyResponse(
             amount,
-            player.getBalance(currency),
+            player.getBalance(currency).toDouble(),
             EconomyResponse.ResponseType.SUCCESS,
             null
         )

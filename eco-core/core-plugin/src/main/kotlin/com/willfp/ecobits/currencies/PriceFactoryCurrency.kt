@@ -26,13 +26,13 @@ class PriceFactoryCurrency(
         private val multipliers = mutableMapOf<UUID, Double>()
 
         override fun canAfford(player: Player, multiplier: Double) =
-            player.getBalance(currency) >= getValue(player, multiplier)
+            player.getBalance(currency).toDouble() >= getValue(player, multiplier)
 
         override fun pay(player: Player, multiplier: Double) =
-            player.adjustBalance(currency, -getValue(player, multiplier))
+            player.adjustBalance(currency, -getValue(player, multiplier).toBigDecimal())
 
         override fun giveTo(player: Player, multiplier: Double) =
-            player.adjustBalance(currency, getValue(player, multiplier))
+            player.adjustBalance(currency, getValue(player, multiplier).toBigDecimal())
 
         override fun getValue(player: Player, multiplier: Double) =
             xp(baseContext.copyWithPlayer(player)) * getMultiplier(player) * multiplier

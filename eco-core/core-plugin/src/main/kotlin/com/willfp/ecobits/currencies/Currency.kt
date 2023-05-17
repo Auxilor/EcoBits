@@ -43,7 +43,7 @@ class Currency(
 
     val name = config.getFormattedString("name")
 
-    val max: BigDecimal? = if (config.has("max"))
+    val max: BigDecimal? = if (config.has("max") && config.getDouble("max") > 0)
         BigDecimal(config.getDouble("max"))
     else null
 

@@ -72,18 +72,18 @@ class CommandPay(
             return
         }
 
-        if (player.getBalance(currency) < amount) {
+        if (player.getBalance(currency) < amount.toBigDecimal()) {
             player.sendMessage(plugin.langYml.getMessage("cannot-afford"))
             return
         }
 
-        if (recipient.getBalance(currency) + amount > currency.max) {
+        if (recipient.getBalance(currency) + amount.toBigDecimal() > currency.max) {
             player.sendMessage(plugin.langYml.getMessage("too-much"))
             return
         }
 
-        recipient.adjustBalance(currency, amount)
-        player.adjustBalance(currency, -amount)
+        recipient.adjustBalance(currency, amount.toBigDecimal())
+        player.adjustBalance(currency, -amount.toBigDecimal())
 
         player.sendMessage(
             plugin.langYml.getMessage("paid-player", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)

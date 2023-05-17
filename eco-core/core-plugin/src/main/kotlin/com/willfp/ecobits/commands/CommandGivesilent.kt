@@ -49,7 +49,7 @@ class CommandGivesilent(
 
         val amount = args[2 + argOffset].toDoubleOrNull() ?: return
 
-        player.adjustBalance(currency, amount)
+        player.adjustBalance(currency, amount.toBigDecimal())
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {

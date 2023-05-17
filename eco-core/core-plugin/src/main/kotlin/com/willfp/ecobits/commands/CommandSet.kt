@@ -64,7 +64,7 @@ class CommandSet(
             return
         }
 
-        player.setBalance(currency, amount)
+        player.setBalance(currency, amount.toBigDecimal())
 
         sender.sendMessage(
             plugin.langYml.getMessage("set-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)

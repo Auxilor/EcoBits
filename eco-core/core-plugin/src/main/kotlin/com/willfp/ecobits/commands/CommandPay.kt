@@ -13,6 +13,7 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
+import java.math.BigDecimal
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -77,9 +78,11 @@ class CommandPay(
             return
         }
 
-        if (recipient.getBalance(currency) + amount.toBigDecimal() > currency.max) {
-            player.sendMessage(plugin.langYml.getMessage("too-much"))
-            return
+        if (currency.max != null) {
+            if (recipient.getBalance(currency) + amount.toBigDecimal() > currency.max) {
+                player.sendMessage(plugin.langYml.getMessage("too-much"))
+                return
+            }
         }
 
         recipient.adjustBalance(currency, amount.toBigDecimal())

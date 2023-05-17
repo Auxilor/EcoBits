@@ -165,13 +165,15 @@ class IntegrationVault(
             return EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.FAILURE, "Can't deposit below 0.")
         }
 
-        if (player.getBalance(currency).toDouble() + amount > currency.max.toDouble()) {
-            return EconomyResponse(
-                0.0,
-                0.0,
-                EconomyResponse.ResponseType.FAILURE,
-                "Can't deposit this much (over max)"
-            )
+        if (currency.max != null) {
+            if (player.getBalance(currency).toDouble() + amount > currency.max.toDouble()) {
+                return EconomyResponse(
+                    0.0,
+                    0.0,
+                    EconomyResponse.ResponseType.FAILURE,
+                    "Can't deposit this much (over max)"
+                )
+            }
         }
 
         player.adjustBalance(currency, amount.toBigDecimal())

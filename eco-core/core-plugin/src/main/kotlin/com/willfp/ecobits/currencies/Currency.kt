@@ -43,7 +43,9 @@ class Currency(
 
     val name = config.getFormattedString("name")
 
-    val max = BigDecimal(config.getDouble("max").let { if (it < 0) Double.POSITIVE_INFINITY else it })
+    val max: BigDecimal? = if (config.has("max"))
+        BigDecimal(config.getDouble("max"))
+    else null
 
     val isPayable = config.getBool("payable")
 
@@ -185,9 +187,12 @@ fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {
 }
 
 fun OfflinePlayer.setBalance(currency: Currency, value: BigDecimal) {
+    val coerced = if (currency.max == null) value.coerceAtLeast(BigDecimal.ZERO)
+    else value.coerceIn(BigDecimal.ZERO..currency.max)
+
     this.profile.write(
         currency.key,
-        value.coerceIn(BigDecimal(0.0)..currency.max)
+        coerced
     )
 }
 

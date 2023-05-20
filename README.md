@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://i.imgur.com/1GHRdhQ.png" alt="EcoBits logo" width="256">
+  <img src="https://i.imgur.com/BjddLwo.png" alt="EcoBits logo" width="128">
   <br>
 </h1>
 
@@ -8,16 +8,16 @@
 
 <p align="center">
     <a href="https://polymart.org/resource/ecobits.1351">
-        <img alt="spigot" src="https://img.shields.io/badge/polymart-EcoBits-9efaff?style=for-the-badge"/>
+        <img alt="spigot" src="https://img.shields.io/badge/polymart-EcoBits-9efaff"/>
     </a>
     <a href="https://bstats.org/plugin/bukkit/EcoBits" alt="bstats servers">
-        <img src="https://img.shields.io/bstats/servers/16908?color=9efaff&style=for-the-badge"/>
+        <img src="https://img.shields.io/bstats/servers/16908?color=9efaff"/>
     </a>
     <a href="https://bstats.org/plugin/bukkit/EcoBits" alt="bstats players">
-        <img src="https://img.shields.io/bstats/players/16908?color=9efaff&style=for-the-badge"/>
+        <img src="https://img.shields.io/bstats/players/16908?color=9efaff"/>
     </a>
     <a href="https://discord.gg/ZcwpSsE/" alt="Discord">
-        <img src="https://img.shields.io/discord/452518336627081236?label=discord&style=for-the-badge&color=9efaff"/>
+        <img src="https://img.shields.io/discord/452518336627081236?label=discord&color=9efaff"/>
     </a>
 </p>
 

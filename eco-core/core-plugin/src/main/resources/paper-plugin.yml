@@ -1,20 +1,21 @@
 name: EcoBits
 version: ${projectVersion}
 main: com.willfp.ecobits.EcoBitsPlugin
-api-version: 1.17
-authors: [ Auxilor ]
-website: willfp.com
+api-version: 1.19
 load: STARTUP
-depend:
-  - eco
-softdepend:
-  - Vault
 
-commands:
-  ecobits:
-    description: Base Command
-    permission: ecobits.command.ecobits
+dependencies:
+  - name: eco
+    required: true
+    bootstrap: false
 
+  - name: Vault
+    required: false
+    bootstrap: false
+
+load-after:
+  - name: eco
+    bootstrap: false
 permissions:
   ecobits.*:
     description: All EcoBits permissions

@@ -192,8 +192,9 @@ fun BigDecimal.formatWithExtension(): String {
 }
 
 fun BigDecimal.formatWithCommas(): String {
-    val decimalFormat = if (this.scale() > 0) DecimalFormat("#,###.00") else DecimalFormat("#,###")
-    return decimalFormat.format(this)
+    val stripped = this.stripTrailingZeros()
+    val decimalFormat = if (stripped.scale() > 0) DecimalFormat("#,##0.00") else DecimalFormat("#,##0")
+    return decimalFormat.format(stripped)
 }
 
 fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {

@@ -123,6 +123,15 @@ class Currency(
         PlaceholderManager.registerPlaceholder(
             PlayerPlaceholder(
                 plugin,
+                "${id}_commas"
+            ) {
+                it.getBalance(this).formatWithCommas()
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
                 "${id}_formatted"
             ) {
                 it.getBalance(this).formatWithExtension()
@@ -180,6 +189,10 @@ fun BigDecimal.formatWithExtension(): String {
     } else {
         DecimalFormat("#,##0").format(numValue)
     }
+}
+
+fun BigDecimal.formatWithCommas(): String {
+    return DecimalFormat("#,###.00").format(this)
 }
 
 fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {

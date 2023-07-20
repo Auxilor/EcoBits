@@ -9,6 +9,7 @@
 
 # Placeholders:
 # %ecobits_<id>% - The balance of a certain currency
+# %ecobits_<id>_commas% - The balance with commas of a certain currency
 # %ecobits_<id>_formatted% - The formatted balance of a certain currency
 # %ecobits_<id>_max% - The max balance of a certain currency
 # %ecobits_<id>_default% - The default balance of a certain currency

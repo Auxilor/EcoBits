@@ -18,7 +18,7 @@ class IntegrationVault(
     }
 
     override fun getName(): String {
-        return "EcoBits"
+        return "EcoBits ${currency.id}"
     }
 
     override fun hasBankSupport(): Boolean {

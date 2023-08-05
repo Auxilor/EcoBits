@@ -7,6 +7,7 @@ import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
+import com.willfp.eco.core.integrations.economy.EconomyManager
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.DynamicPlaceholder
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
@@ -159,11 +160,6 @@ class Currency(
         Prices.registerPriceFactory(PriceFactoryCurrency(this))
 
         if (isRegisteredWithVault && IntegrationVault.isVaultPresent) {
-            // Override Vault economy
-            Bukkit.getServer().servicesManager.getRegistration(Economy::class.java)?.let {
-                Bukkit.getServer().servicesManager.unregister(it.provider)
-            }
-
             Bukkit.getServer().servicesManager.register(
                 Economy::class.java,
                 IntegrationVault(this),
@@ -174,6 +170,14 @@ class Currency(
 
         this.unregisterCommands()
         this.registerCommands()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is Currency && other.id == this.id
+    }
+
+    override fun hashCode(): Int {
+        return this.id.hashCode()
     }
 }
 

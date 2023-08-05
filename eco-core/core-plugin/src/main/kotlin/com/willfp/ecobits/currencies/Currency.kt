@@ -159,6 +159,11 @@ class Currency(
         Prices.registerPriceFactory(PriceFactoryCurrency(this))
 
         if (isRegisteredWithVault && IntegrationVault.isVaultPresent) {
+            // Override Vault economy
+            Bukkit.getServer().servicesManager.getRegistration(Economy::class.java)?.let {
+                Bukkit.getServer().servicesManager.unregister(it.provider)
+            }
+
             Bukkit.getServer().servicesManager.register(
                 Economy::class.java,
                 IntegrationVault(this),

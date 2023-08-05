@@ -28,7 +28,7 @@ currencies:
     max: -1 # The maximum balance, set to -1 if no max.
     payable: false # If players should be able to use /ecobits pay to pay other players
     decimal: true # If decimal amounts are allowed rather than just integer amounts
-    vault: false # If this currency should be registered with vault
+    vault: false # If this currency should be registered with vault (Only one currency can be registered with vault)
     local: false # If this currency should not sync between servers
     commands: # A list of commands dedicated to this currency (for easier paying, checking balance, etc)
       - crystals

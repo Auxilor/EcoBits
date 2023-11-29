@@ -7,6 +7,7 @@ import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
+import com.willfp.eco.core.integrations.economy.EconomyManager
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.DynamicPlaceholder
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
@@ -123,6 +124,15 @@ class Currency(
         PlaceholderManager.registerPlaceholder(
             PlayerPlaceholder(
                 plugin,
+                "${id}_commas"
+            ) {
+                it.getBalance(this).formatWithCommas()
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
                 "${id}_formatted"
             ) {
                 it.getBalance(this).formatWithExtension()
@@ -161,6 +171,14 @@ class Currency(
         this.unregisterCommands()
         this.registerCommands()
     }
+
+    override fun equals(other: Any?): Boolean {
+        return other is Currency && other.id == this.id
+    }
+
+    override fun hashCode(): Int {
+        return this.id.hashCode()
+    }
 }
 
 data class LeaderboardPlace(
@@ -180,6 +198,12 @@ fun BigDecimal.formatWithExtension(): String {
     } else {
         DecimalFormat("#,##0").format(numValue)
     }
+}
+
+fun BigDecimal.formatWithCommas(): String {
+    val stripped = this.stripTrailingZeros()
+    val decimalFormat = if (stripped.scale() > 0) DecimalFormat("#,##0.00") else DecimalFormat("#,##0")
+    return decimalFormat.format(stripped)
 }
 
 fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {

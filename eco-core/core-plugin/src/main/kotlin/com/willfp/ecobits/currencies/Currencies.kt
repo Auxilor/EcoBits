@@ -35,7 +35,6 @@ object Currencies {
      *
      * @param plugin Instance of EcoBits.
      */
-    @ConfigUpdater
     @JvmStatic
     fun update(plugin: EcoBitsPlugin) {
         for (currency in values()) {

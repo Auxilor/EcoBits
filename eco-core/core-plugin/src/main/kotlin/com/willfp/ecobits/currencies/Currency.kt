@@ -56,6 +56,8 @@ class Currency(
 
     val isLocal = config.getBool("local")
 
+    val hasShortBalanceCommand = config.getBool("balance-shorthand")
+
     val commands = config.getStrings("commands").map { DynamicCurrencyCommand(plugin, it, this) }
 
     val key = PersistentDataKey(

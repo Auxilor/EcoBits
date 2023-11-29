@@ -30,6 +30,7 @@ currencies:
     decimal: true # If decimal amounts are allowed rather than just integer amounts
     vault: false # If this currency should be registered with vault (Only one currency can be registered with vault, requires server restart)
     local: false # If this currency should not sync between servers
+    balance-shorthand: false # If this currency main command (/crystals) should act as balance command
     commands: # A list of commands dedicated to this currency (for easier paying, checking balance, etc)
       - crystals
       - ecocrystals

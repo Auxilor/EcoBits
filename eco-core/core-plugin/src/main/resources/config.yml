@@ -13,6 +13,8 @@
 # %ecobits_<id>_max% - The max balance of a certain currency
 # %ecobits_<id>_default% - The default balance of a certain currency
 # %ecobits_<id>_name% - The display name of a certain currency
+# %ecobits_top_<currency>_<place>_<name/amount>% - The name or balance of the player in a leaderboard position
+# %ecobits_top_<currency>_<place>_<name/amount>_<formatted/raw>% - The name or raw/formatted balance of the player in a leaderboard position
 
 server-id: "main" # Server ID for local currencies over MySQL/MongoDB.
 

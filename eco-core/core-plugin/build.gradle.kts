@@ -16,8 +16,23 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
+        register<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            version = project.version.toString()
+            artifactId = rootProject.name
+
+            artifact(rootProject.tasks.shadowJar.get().archiveFile)
+        }
+    }
+
+    repositories {
+        maven {
+            name = "auxilor"
+            url = uri("https://repo.auxilor.io/repository/maven-releases/")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
         }
     }
 }

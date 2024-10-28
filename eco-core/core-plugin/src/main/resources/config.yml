@@ -19,6 +19,11 @@
 
 server-id: "main" # Server ID for local currencies over MySQL/MongoDB.
 
+# allow-offline-players-in-commands: true
+# Determines if commands should be usable on offline players.
+# Note: Changes to this setting require a server restart to take effect.
+allow-offline-players-in-commands: true
+
 cache-expire-after: 300 # Leaderboard cache expire time in seconds.
 
 currencies:

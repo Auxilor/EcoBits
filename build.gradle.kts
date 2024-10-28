@@ -44,7 +44,7 @@ allprojects {
         compileOnly("org.jetbrains:annotations:23.0.0")
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
 
-        compileOnly("me.clip:placeholderapi:2.11.2")
+        compileOnly("me.clip:placeholderapi:2.11.6")
         compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.0")
     }
 

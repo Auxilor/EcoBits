@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 buildscript {
     repositories {
@@ -6,13 +7,13 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
     }
 }
 
 plugins {
     id("java-library")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.gradleup.shadow") version "8.3.0"
     id("maven-publish")
     id("java")
 }
@@ -26,7 +27,7 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
     apply(plugin = "maven-publish")
-    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "com.gradleup.shadow")
 
     repositories {
         mavenCentral()
@@ -36,15 +37,15 @@ allprojects {
         maven { url = uri("https://repo.codemc.org/repository/nms/") }
         maven { url = uri("https://repo.codemc.io/repository/maven-public/") }
         maven { url = uri("https://repo.dmulloy2.net/repository/public/") }
-        maven { url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/") }
+        maven { url = uri("https://repo.helpch.at/releases") }
     }
 
     dependencies {
         compileOnly("com.willfp:eco:6.60.0")
         compileOnly("org.jetbrains:annotations:23.0.0")
-        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
 
-        compileOnly("me.clip:placeholderapi:2.11.2")
+        compileOnly("me.clip:placeholderapi:2.11.6")
         compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.0")
     }
 
@@ -53,8 +54,8 @@ allprojects {
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "17"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 

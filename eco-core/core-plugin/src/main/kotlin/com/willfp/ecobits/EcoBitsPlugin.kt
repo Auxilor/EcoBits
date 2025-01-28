@@ -12,6 +12,11 @@ import org.bukkit.event.Listener
 class EcoBitsPlugin : EcoPlugin() {
     val serverID = configYml.getString("server-id")
 
+    //
+    val allowOfflinePlayersString = configYml.getString("allow-offline-players-in-commands")
+    val allowOfflinePlayers = allowOfflinePlayersString.toBoolean()
+    //
+
     init {
         instance = this
     }

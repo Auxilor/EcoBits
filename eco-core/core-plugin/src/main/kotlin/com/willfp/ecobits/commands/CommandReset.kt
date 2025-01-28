@@ -5,6 +5,7 @@ import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
+import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.setBalance
@@ -14,13 +15,13 @@ import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class CommandReset(
-    plugin: EcoPlugin,
-    private val currency: Currency? = null
+        plugin: EcoPlugin,
+        private val currency: Currency? = null
 ) : Subcommand(
-    plugin,
-    "reset",
-    "ecobits.command.reset",
-    false
+        plugin,
+        "reset",
+        "ecobits.command.reset",
+        false
 ) {
     private val argOffset = if (currency == null) 0 else -1
 
@@ -35,16 +36,27 @@ class CommandReset(
             return
         }
 
-        @Suppress("DEPRECATION")
-        val player = Bukkit.getOfflinePlayer(args[0])
+        val allowOfflinePlayers = EcoBitsPlugin.instance.allowOfflinePlayers
+        val targetPlayer: OfflinePlayer? = if (allowOfflinePlayers) {
+            Bukkit.getOfflinePlayer(args[0])
+        } else {
+            Bukkit.getPlayer(args[0])
+        }
 
-        if (!player.hasPlayedBefore() && !player.isOnline) {
+        // Don't allow the usage on offline players
+        if (targetPlayer == null || (!allowOfflinePlayers && !targetPlayer.isOnline)) {
+            sender.sendMessage(plugin.langYml.getMessage("player-not-online"))
+            return
+        }
+
+        // Don't allow the usage on player that don't exist
+        if (!targetPlayer.hasPlayedBefore() && !targetPlayer.isOnline) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-player"))
             return
         }
 
         val currency = determineCurrency(sender, args) ?: return
-        resetPlayerCurrency(sender, player, currency)
+        resetPlayerCurrency(sender, targetPlayer, currency)
     }
 
     private fun determineCurrency(sender: CommandSender, args: List<String>): Currency? {
@@ -59,12 +71,12 @@ class CommandReset(
         player.setBalance(currency, currency.default)
 
         sender.sendMessage(
-            player.name?.let {
-                plugin.langYml.getMessage("reset-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                    .replace("%player%", player.savedDisplayName)
-                    .replace("%amount%", currency.default.toNiceString())
-                    .replace("%currency%", currency.name)
-            }
+                player.name?.let {
+                    plugin.langYml.getMessage("reset-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                            .replace("%player%", player.savedDisplayName)
+                            .replace("%amount%", currency.default.toNiceString())
+                            .replace("%currency%", currency.name)
+                }
         )
     }
 
@@ -76,9 +88,9 @@ class CommandReset(
         }
 
         sender.sendMessage(
-            plugin.langYml.getMessage("reset-all-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .replace("%amount%", currency.default.toNiceString())
-                .replace("%currency%", currency.name)
+                plugin.langYml.getMessage("reset-all-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                        .replace("%amount%", currency.default.toNiceString())
+                        .replace("%currency%", currency.name)
         )
     }
 
@@ -86,22 +98,30 @@ class CommandReset(
         val completions = mutableListOf<String>()
 
         if (args.isEmpty()) {
-            return Bukkit.getOfflinePlayers().mapNotNull { it.name }
+            return if (EcoBitsPlugin.instance.allowOfflinePlayers) {
+                Bukkit.getOfflinePlayers().mapNotNull { it.name }
+            } else {
+                Bukkit.getOnlinePlayers().map { it.name }
+            }
         }
 
         if (args.size == 1) {
             StringUtil.copyPartialMatches(
-                args[0],
-                Bukkit.getOfflinePlayers().map { it.name } + listOf("all"),
-                completions
+                    args[0],
+                    if (EcoBitsPlugin.instance.allowOfflinePlayers) {
+                        Bukkit.getOfflinePlayers().map { it.name } + listOf("all")
+                    } else {
+                        Bukkit.getOnlinePlayers().map { it.name } + listOf("all")
+                    },
+                    completions
             )
         }
 
         if (this.currency == null && args.size == 2) {
             StringUtil.copyPartialMatches(
-                args[1],
-                Currencies.values().map { it.id },
-                completions
+                    args[1],
+                    Currencies.values().map { it.id },
+                    completions
             )
         }
 

@@ -20,6 +20,7 @@ messages:
   cannot-afford: "&cYou can't afford to do this!"
   paid-player: "&fYou paid %player%&r &a%amount%&r &f%currency%&f!"
   too-much: "&fYou can't pay %player%&r this many &f%currency%&f as they already have too many!"
+  player-not-online: "&fThe specified player is not &aonline&f!"
 top:
   name-empty: "&cEmpty"
   amount-empty: "&cEmpty"

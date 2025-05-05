@@ -88,6 +88,17 @@ class CommandPay(
         recipient.adjustBalance(currency, amount.toBigDecimal())
         player.adjustBalance(currency, -amount.toBigDecimal())
 
+        // Send a message to recipient if connected
+        if (recipient.isOnline) {
+            (recipient.player as Player).sendMessage(
+                plugin.langYml.getMessage("received-money", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                    .replace("%player%", player.savedDisplayName)
+                    .replace("%amount%", amount.toNiceString())
+                    .replace("%currency%", currency.name)
+            )
+        }
+
+
         player.sendMessage(
             plugin.langYml.getMessage("paid-player", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%player%", recipient.savedDisplayName)

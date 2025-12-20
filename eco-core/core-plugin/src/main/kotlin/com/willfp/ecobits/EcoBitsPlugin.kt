@@ -7,6 +7,7 @@ import com.willfp.eco.core.integrations.IntegrationLoader
 import com.willfp.eco.util.ClassUtils
 import com.willfp.ecobits.commands.CommandEcoBits
 import com.willfp.ecobits.currencies.Currencies
+import com.willfp.ecobits.currencies.EcoBitsTopPlaceholder
 import com.willfp.ecobits.integrations.IntegrationVault
 import org.bukkit.event.Listener
 
@@ -23,6 +24,10 @@ class EcoBitsPlugin : EcoPlugin() {
             IntegrationVault.isVaultPresent = true
             Currencies.update(this)
         }
+    }
+
+    override fun handleEnable() {
+        EcoBitsTopPlaceholder(this).register()
     }
 
     override fun handleReload() {

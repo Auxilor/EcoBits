@@ -16,6 +16,7 @@ class CommandEcoBits(plugin: EcoPlugin) : PluginCommand(plugin, "ecobits", "ecob
             .addSubcommand(CommandBalance(plugin))
             .addSubcommand(CommandTake(plugin))
             .addSubcommand(CommandTakesilent(plugin))
+            .addSubcommand(CommandTop(plugin))
     }
 
     override fun onExecute(sender: CommandSender, args: List<String>) {

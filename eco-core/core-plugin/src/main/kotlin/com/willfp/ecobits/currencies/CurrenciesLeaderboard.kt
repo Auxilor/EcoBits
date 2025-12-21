@@ -1,15 +1,19 @@
 package com.willfp.ecobits.currencies
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.willfp.ecobits.plugin
 import com.willfp.ecobits.util.LeaderboardEntry
 import org.bukkit.Bukkit
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 object CurrenciesLeaderboard {
     private var leaderboardCache = Caffeine.newBuilder()
-        .expireAfterWrite(1, TimeUnit.MINUTES)
+        .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("leaderboard.cache-lifetime").toLong()))
         .build<Boolean, Map<Currency, List<UUID>>> {
+            if (!plugin.configYml.getBool("leaderboard.enabled"))
+                return@build emptyMap()
             val offlinePlayers = Bukkit.getOfflinePlayers()
             val top = mutableMapOf<Currency, List<UUID>>()
             for (currency in Currencies.values())

@@ -16,7 +16,8 @@ class CommandEcoBits(plugin: EcoPlugin) : PluginCommand(plugin, "ecobits", "ecob
             .addSubcommand(CommandBalance(plugin))
             .addSubcommand(CommandTake(plugin))
             .addSubcommand(CommandTakesilent(plugin))
-            .addSubcommand(CommandTop(plugin))
+        if (plugin.configYml.getBool("leaderboard.enabled"))
+            this.addSubcommand(CommandTop(plugin))
     }
 
     override fun onExecute(sender: CommandSender, args: List<String>) {

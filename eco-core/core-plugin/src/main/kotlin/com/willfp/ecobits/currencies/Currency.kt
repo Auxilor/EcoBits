@@ -117,17 +117,18 @@ class Currency(
             }
         )
 
-        PlaceholderManager.registerPlaceholder(
-            PlayerPlaceholder(
-                plugin,
-                "${id}_leaderboard_rank"
+        if (plugin.configYml.getBool("leaderboard.enabled"))
+            PlaceholderManager.registerPlaceholder(
+                PlayerPlaceholder(
+                    plugin,
+                    "${id}_leaderboard_rank"
+                )
+                { player ->
+                    val emptyPosition = plugin.langYml.getString("top.empty-position")
+                    val position = getPosition(player.uniqueId)
+                    position?.toString() ?: emptyPosition
+                }.register()
             )
-            { player ->
-                val emptyPosition = plugin.langYml.getString("top.empty-position")
-                val position = getPosition(player.uniqueId)
-                position?.toString() ?: emptyPosition
-            }.register()
-        )
 
         PlaceholderManager.registerPlaceholder(
             PlayerlessPlaceholder(

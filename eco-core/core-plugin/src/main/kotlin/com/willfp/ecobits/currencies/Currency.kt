@@ -14,8 +14,10 @@ import com.willfp.eco.core.price.Prices
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
+import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getPosition
+import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import com.willfp.ecobits.integrations.IntegrationVault
-import com.willfp.ecobits.util.LeaderboardPlace
+import com.willfp.ecobits.util.LeaderboardEntry
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -33,31 +35,13 @@ class Currency(
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
-    private val leaderboardCache = Caffeine.newBuilder()
-        .expireAfterWrite(1, TimeUnit.MINUTES)
-        .build<Boolean, List<UUID>> {
-            Bukkit.getOfflinePlayers().sortedByDescending {
-                getBalance(it)
-            }.map { it.uniqueId }
-        }
 
-    fun getTop(position: Int): LeaderboardPlace? {
-        require(position > 0) { "Position must be greater than 0" }
-
-        val uuid = leaderboardCache.get(true).getOrNull(position - 1) ?: return null
-
-        val player = Bukkit.getOfflinePlayer(uuid).takeIf { it.hasPlayedBefore() } ?: return null
-
-        return LeaderboardPlace(
-            player,
-            getBalance(player)
-        )
+    fun getTop(position: Int): LeaderboardEntry? {
+        return getTop(this, position)
     }
 
     fun getPosition(uuid: UUID): Int? {
-        val leaderboard = leaderboardCache.get(true)
-        val index = leaderboard.indexOf(uuid)
-        return if (index == -1) null else index + 1
+        return getPosition(this, uuid)
     }
 
     private val descCache = Caffeine.newBuilder()
@@ -133,16 +117,18 @@ class Currency(
             }
         )
 
-        PlaceholderManager.registerPlaceholder(
-            PlayerPlaceholder(
-                plugin,
-                "${id}_leaderboard_rank")
-            { player ->
-                val emptyPosition = plugin.langYml.getString("top.empty-position")
-                val position = getPosition(player.uniqueId)
-                position?.toString() ?: emptyPosition
-            }.register()
-        )
+        if (plugin.configYml.getBool("leaderboard.enabled"))
+            PlaceholderManager.registerPlaceholder(
+                PlayerPlaceholder(
+                    plugin,
+                    "${id}_leaderboard_rank"
+                )
+                { player ->
+                    val emptyPosition = plugin.langYml.getString("top.empty-position")
+                    val position = getPosition(player.uniqueId)
+                    position?.toString() ?: emptyPosition
+                }.register()
+            )
 
         PlaceholderManager.registerPlaceholder(
             PlayerlessPlaceholder(

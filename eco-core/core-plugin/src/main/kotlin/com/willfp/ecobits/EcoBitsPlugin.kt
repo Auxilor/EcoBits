@@ -1,6 +1,7 @@
 package com.willfp.ecobits
 
 import com.willfp.eco.core.EcoPlugin
+import com.willfp.eco.core.Prerequisite
 import com.willfp.eco.core.command.impl.PluginCommand
 import com.willfp.eco.core.integrations.IntegrationLoader
 import com.willfp.eco.util.ClassUtils
@@ -38,8 +39,10 @@ class EcoBitsPlugin : EcoPlugin() {
         )
     }
 
+    @Deprecated(message = "Will be removed in favour of eco-api-verison in eco.yml")
+    @Suppress("REMOVAL")
     override fun getMinimumEcoVersion(): String {
-        return "6.60.0"
+        return "6.77.0"
     }
 
     companion object {

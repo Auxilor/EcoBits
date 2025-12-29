@@ -142,6 +142,15 @@ class Currency(
         )
 
         PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
+                "${id}_integer"
+            ) {
+                it.getBalance(this).toInt().toString()
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
             PlayerlessPlaceholder(
                 plugin,
                 "${id}_name"

@@ -3,7 +3,6 @@ package com.willfp.ecobits.currencies
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableList
-import com.willfp.eco.core.config.updating.ConfigUpdater
 import com.willfp.ecobits.EcoBitsPlugin
 
 object Currencies {

@@ -1,6 +1,9 @@
+environment:
+  - name: libreforge version
+    value: ${libreforgeVersion}
+
 options:
   resource-id: 4125
   bstats-id: 16908
   color: "&#9efaff"
   uses-reflective-reload: false
-  eco-api-version: 6.77.0

@@ -1,26 +1,26 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
-    }
+plugins {
+    kotlin("jvm") version "2.3.0"
+    id("java")
+    id("java-library")
+    id("maven-publish")
+    id("com.gradleup.shadow") version "9.3.1"
+    id("com.willfp.libreforge-gradle-plugin") version "1.0.3"
 }
 
-plugins {
-    id("java-library")
-    id("com.gradleup.shadow") version "8.3.0"
-    id("maven-publish")
-    id("java")
+group = "com.willfp"
+version = findProperty("version")!!
+val libreforgeVersion = findProperty("libreforge-version")
+
+base {
+    archivesName.set(project.name)
 }
 
 dependencies {
-    implementation(project(":eco-core"))
-    implementation(project(":eco-core:core-plugin"))
+    project.project(project(":eco-core").path).subprojects {
+        implementation(this)
+    }
 }
 
 allprojects {
@@ -32,93 +32,58 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
-        maven { url = uri("https://jitpack.io") }
-        maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
-        maven { url = uri("https://repo.codemc.org/repository/nms/") }
-        maven { url = uri("https://repo.codemc.io/repository/maven-public/") }
-        maven { url = uri("https://repo.dmulloy2.net/repository/public/") }
-        maven { url = uri("https://repo.helpch.at/releases") }
+
+        maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://repo.auxilor.io/repository/maven-public/")
+        maven("https://jitpack.io")
+        maven("https://repo.dmulloy2.net/repository/public/")
+        maven("https://repo.helpch.at/releases")
     }
 
     dependencies {
-        compileOnly("com.willfp:eco:6.77.0")
-        compileOnly("org.jetbrains:annotations:23.0.0")
-        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
+        compileOnly("com.willfp:eco:6.77.3")
+        compileOnly("org.jetbrains:annotations:26.0.2")
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
+        compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
 
-        compileOnly("me.clip:placeholderapi:2.11.6")
-        compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.0")
+        compileOnly("me.clip:placeholderapi:2.11.7")
     }
 
-    tasks.withType<JavaCompile> {
-        options.encoding = "UTF-8"
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
+    java {
+        withSourcesJar()
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
 
     tasks {
-        java {
-            sourceCompatibility = JavaVersion.VERSION_21
-            targetCompatibility = JavaVersion.VERSION_21
+        shadowJar {
+            relocate("com.willfp.libreforge.loader", "com.willfp.ecoitems.libreforge.loader")
+        }
+
+        compileKotlin {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_21)
+            }
         }
 
         compileJava {
+            options.isDeprecation = true
             options.encoding = "UTF-8"
+
             dependsOn(clean)
         }
 
         processResources {
-            filesMatching(listOf("**plugin.yml")) {
-                expand(mapOf("projectVersion" to project.version))
+            filesMatching(listOf("**plugin.yml", "**eco.yml")) {
+                expand(
+                    "version" to project.version,
+                    "libreforgeVersion" to libreforgeVersion!!,
+                    "pluginName" to rootProject.name
+                )
             }
         }
 
         build {
-            dependsOn("shadowJar")
+            dependsOn(shadowJar)
         }
-    }
-}
-
-group = "com.willfp"
-version = findProperty("version")!!
-
-tasks.register("buyThePlugins") {
-    doLast {
-        println("If you like the plugin, please consider buying it on Spigot or Polymart!")
-        println("Spigot: https://www.spigotmc.org/resources/authors/auxilor.507394/")
-        println("Polymart: https://polymart.org/user/auxilor.1107/")
-        println("Buying gives you access to support and the plugin auto-updater, and it allows me to keep developing plugins.")
-    }
-}
-
-tasks {
-    build {
-        dependsOn("publishToMavenLocal")
-        finalizedBy("buyThePlugins")
-    }
-
-    withType<Jar> {
-        destinationDirectory.set(file("$rootDir/bin/"))
-    }
-
-    register("cleanBin") {
-        doLast {
-            file("$rootDir/bin").deleteRecursively()
-        }
-    }
-
-    clean {
-        finalizedBy("cleanBin")
-    }
-
-    named<ShadowJar>("shadowJar") {
-        archiveFileName.set("${findProperty("plugin-name")} v${findProperty("version")}.jar")
-    }
-
-    named<Jar>("jar") {
-        archiveFileName.set("${findProperty("plugin-name")} v${findProperty("version")} unshaded.jar")
     }
 }

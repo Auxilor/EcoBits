@@ -15,34 +15,23 @@ import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
 import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getPosition
-import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import com.willfp.ecobits.integrations.IntegrationVault
-import com.willfp.ecobits.util.LeaderboardEntry
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.math.BigDecimal
 import java.text.DecimalFormat
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 
-class Currency(
+open class Currency(
     val id: String,
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
-
-    fun getTop(position: Int): LeaderboardEntry? {
-        return getTop(this, position)
-    }
-
-    fun getPosition(uuid: UUID): Int? {
-        return getPosition(this, uuid)
-    }
 
     private val descCache = Caffeine.newBuilder()
         .expireAfterWrite(plugin.configYml.getInt("gui.cache-ttl").toLong(), TimeUnit.MILLISECONDS)
@@ -64,7 +53,7 @@ class Currency(
 
     val isLocal = config.getBool("local")
 
-    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(plugin, it, this) }
+    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(it, this) }
 
     val key = PersistentDataKey(
         plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),

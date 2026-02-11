@@ -6,15 +6,14 @@ import com.willfp.eco.core.placeholder.context.PlaceholderContext
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
+import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import java.util.regex.Pattern
 
-class EcoBitsTopPlaceholder(
-    private val plugin: EcoPlugin
-) : RegistrablePlaceholder {
+object EcoBitsTopPlaceholder : RegistrablePlaceholder {
     private val pattern = Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|integer))?")
 
     override fun getPattern(): Pattern = pattern
-    override fun getPlugin(): EcoPlugin = plugin
+    override fun getPlugin(): EcoPlugin = com.willfp.ecobits.plugin
 
     override fun getValue(params: String, ctx: PlaceholderContext): String? {
         val emptyPosition: String = plugin.langYml.getString("top.empty-position")
@@ -31,7 +30,7 @@ class EcoBitsTopPlaceholder(
         val topEntry = currency.getTop(place) ?: return emptyPosition
 
         return when (type) {
-            "name" -> topEntry.player?.savedDisplayName ?: emptyPosition
+            "name" -> topEntry.player.savedDisplayName
             "amount" -> {
                 val amount = topEntry.amount
                 when (formatType) {

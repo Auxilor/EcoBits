@@ -1,6 +1,5 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
@@ -9,16 +8,15 @@ import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
 import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
-import java.math.BigDecimal
 import kotlin.math.ceil
 import kotlin.math.floor
 
 class CommandPay(
-    plugin: EcoPlugin,
     private val currency: Currency? = null
 ) : Subcommand(
     plugin,

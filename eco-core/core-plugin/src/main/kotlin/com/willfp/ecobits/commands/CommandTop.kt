@@ -1,21 +1,21 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.core.placeholder.context.placeholderContext
 import com.willfp.eco.util.formatEco
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
+import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.formatWithCommas
 import com.willfp.ecobits.currencies.formatWithExtension
+import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
 
 class CommandTop(
-    plugin: EcoPlugin,
     private val currency: Currency? = null
 ) : Subcommand(
     plugin,

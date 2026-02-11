@@ -2,16 +2,10 @@ group = "com.willfp"
 version = rootProject.version
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
 
     compileOnly(fileTree("../../lib") { include("*.jar") })
-}
-
-tasks {
-    build {
-        dependsOn("publishToMavenLocal")
-    }
 }
 
 publishing {
@@ -25,14 +19,22 @@ publishing {
         }
     }
 
-    repositories {
-        maven {
-            name = "auxilor"
-            url = uri("https://repo.auxilor.io/repository/maven-releases/")
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+    publishing {
+        repositories {
+            maven {
+                name = "auxilor"
+                url = uri("https://repo.auxilor.io/repository/maven-releases/")
+                credentials {
+                    username = System.getenv("MAVEN_USERNAME")
+                    password = System.getenv("MAVEN_PASSWORD")
+                }
             }
         }
+    }
+}
+
+tasks {
+    build {
+        dependsOn(publishToMavenLocal)
     }
 }

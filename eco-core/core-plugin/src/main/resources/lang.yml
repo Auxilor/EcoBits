@@ -11,18 +11,19 @@ messages:
   invalid-currency: "&cInvalid currency!"
   must-specify-amount: "&cYou must specify an amount!"
   invalid-amount: "&cInvalid amount!"
-  set-currency: "&fSet %player%&r to have &a%amount%&r &f%currency%&f!"
-  reset-currency: "&fReset %player%&r to have &a%amount%&r &f%currency%&f!"
-  reset-all-currency: "&fReset All Players&r to have &a%amount%&r &f%currency%&f!"
-  gave-currency: "&fGave %player%&r &a%amount%&r &f%currency%&f!"
-  other-balance: "&f%player%&f has &a%amount%&r &f%currency%&f!"
-  balance: "You have &a%amount%&r &f%currency%&f!"
+  set-currency: "&fSet %player%&r to have &a%amount_formatted%&f!"
+  reset-currency: "&fReset %player%&r to have &a%amount_formatted%&f!"
+  reset-all-currency: "&fReset All Players&r to have &a%amount_formatted%&f!"
+  gave-currency: "&fGave %player%&r &a%amount_formatted%&f!"
+  other-balance: "&f%player%&f has &a%amount_formatted%&f!"
+  balance: "You have &a%amount_formatted%&r &f%currency%&f!"
   cannot-afford: "&cYou can't afford to do this!"
-  paid-player: "&fYou paid %player%&r &a%amount%&r &f%currency%&f!"
+  paid-player: "&fYou paid %player%&r &a%amount_formatted%&f!"
   too-much: "&fYou can't pay %player%&r this many &f%currency%&f as they already have too many!"
-  received-money: "&fYou received &a%amount% &f%currency% from %player%."
+  received-money: "&fYou received &a%amount_formatted% &ffrom %player%."
 
-top-line-format: "%rank%. %player% - %balance_commas%" # %balance%, %balance_commas%, %balance_formatted%, %balance_integer%
+# %balance%, %balance_short%, %balance_formatted%, %balance_formatted_short%, %balance_commas%, %balance_integer%
+top-line-format: "%rank%. %player% - %balance_formatted%"
 top:
   empty-position: "&cN/A"
   format:

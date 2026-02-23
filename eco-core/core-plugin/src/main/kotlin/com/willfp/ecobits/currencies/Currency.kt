@@ -65,9 +65,9 @@ open class Currency(
         default
     )
 
-    val format = config.getString("format")
+    val format = config.getFormattedString("format")
 
-    val formatShort = config.getString("format-short")
+    val formatShort = config.getFormattedString("format-short")
 
     val decimalFormat = DecimalFormat(config.getString("decimal-format"))
 

@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 
 object EcoBitsTopPlaceholder : RegistrablePlaceholder {
     private val pattern =
-        Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|integer|short|formatted_short))?")
+        Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|raw|integer|short|formatted_short))?")
 
     override fun getPattern(): Pattern = pattern
     override fun getPlugin(): EcoPlugin = com.willfp.ecobits.plugin
@@ -39,6 +39,7 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
                     "formatted_short" -> amount.formatShort(currency)
                     "commas" -> amount.formatWithCommas()
                     "integer" -> amount.toInt().toString()
+                    "raw" -> amount.toInt().toString()
                     else -> amount.decimalFormat(currency)
                 }
             }

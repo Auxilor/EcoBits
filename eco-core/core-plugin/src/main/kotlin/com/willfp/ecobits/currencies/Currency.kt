@@ -53,6 +53,10 @@ open class Currency(
 
     val isDecimal = config.getBool("decimal")
 
+    val maxDecimals = if (config.has("max-decimals") && config.getInt("max-decimals") > 0)
+        config.getInt("max-decimals")
+    else 0
+
     val isRegisteredWithVault = config.getBool("vault")
 
     val isLocal = config.getBool("local")
@@ -115,6 +119,15 @@ open class Currency(
                 "${id}_formatted_short"
             ) {
                 it.getBalance(this).formatShort(this)
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
+                "${id}_raw"
+            ) {
+                it.getBalance(this).toPlainString()
             }
         )
 
@@ -207,6 +220,12 @@ fun BigDecimal.hasDecimals(): Boolean {
     return this.setScale(0, RoundingMode.CEILING) != this.setScale(0, RoundingMode.FLOOR)
 }
 
+fun BigDecimal.numOfDecimals(): Int {
+    val plain = this.stripTrailingZeros().toPlainString()
+    val index = plain.indexOf('.')
+    return if (index < 0) 0 else plain.length - index - 1
+}
+
 @Deprecated("Deprecated")
 fun BigDecimal.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')
@@ -225,14 +244,14 @@ fun BigDecimal.formatWithExtension(): String {
 fun BigDecimal.format(currency: Currency): String {
     return currency.format
         .replace("%amount%", this.decimalFormat(currency))
-        .replace("%name%", currency.name)
+        .replace("%currency%", currency.name)
         .replace("%symbol%", currency.symbol)
 }
 
 fun BigDecimal.formatShort(currency: Currency): String {
     return currency.formatShort
         .replace("%amount%", this.decimalFormatShort(currency))
-        .replace("%name%", currency.name)
+        .replace("%currency%", currency.name)
         .replace("%symbol%", currency.symbol)
 }
 

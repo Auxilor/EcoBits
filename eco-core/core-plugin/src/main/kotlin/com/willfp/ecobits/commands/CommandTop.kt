@@ -67,6 +67,7 @@ class CommandTop(
                     .replace("%balance_formatted%", balance.format(currency))
                     .replace("%balance_formatted_short%", balance.formatShort(currency))
                     .replace("%balance_commas%", balance.formatWithCommas())
+                    .replace("%balance_raw%", balance.toPlainString())
                     .replace("%balance_integer%", balance.toInt().toString())
                     .replace("%player%", player.savedDisplayName)
 
@@ -86,6 +87,7 @@ class CommandTop(
                             player = sender as? Player
                         )
                     ).replace("%currency%", currency.name)
+                        .replace("%symbol%", currency.symbol)
                 )
             }
         }

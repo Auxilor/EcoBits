@@ -10,6 +10,7 @@ import com.willfp.ecobits.currencies.decimalFormatShort
 import com.willfp.ecobits.currencies.format
 import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.hasDecimals
+import com.willfp.ecobits.currencies.numOfDecimals
 import com.willfp.ecobits.currencies.setBalance
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
@@ -71,6 +72,11 @@ class CommandSet(
             return
         }
 
+        if (amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) {
+            sender.sendMessage(plugin.langYml.getMessage("invalid-amount"))
+            return
+        }
+
         player.setBalance(currency, amount)
 
         sender.sendMessage(
@@ -80,8 +86,10 @@ class CommandSet(
                 .replace("%amount_short%", amount.decimalFormatShort(currency))
                 .replace("%amount_formatted%", amount.format(currency))
                 .replace("%amount_formatted_short%", amount.formatShort(currency))
+                .replace("%amount_raw%", amount.toPlainString())
+                .replace("%amount_integer%", amount.toInt().toString())
                 .replace("%currency%", currency.name)
-                .replace("%currency_symbol%", currency.symbol)
+                .replace("%symbol%", currency.symbol)
         )
     }
 

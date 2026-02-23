@@ -70,7 +70,7 @@ class CommandReset(
                     .replace("%amount_formatted%", currency.default.format(currency))
                     .replace("%amount_formatted_short%", currency.default.formatShort(currency))
                     .replace("%currency%", currency.name)
-                    .replace("%currency_symbol%", currency.symbol)
+                    .replace("%symbol%", currency.symbol)
             )
         }
     }
@@ -88,8 +88,10 @@ class CommandReset(
                 .replace("%amount_short%", currency.default.decimalFormatShort(currency))
                 .replace("%amount_formatted%", currency.default.format(currency))
                 .replace("%amount_formatted_short%", currency.default.formatShort(currency))
+                .replace("%amount_raw%", currency.default.toPlainString())
+                .replace("%amount_integer%", currency.default.toInt().toString())
                 .replace("%currency%", currency.name)
-                .replace("%currency_symbol%", currency.symbol)
+                .replace("%symbol%", currency.symbol)
         )
     }
 

@@ -13,10 +13,13 @@
 # %ecobits_<id>_formatted% - The formatted balance of a certain currency
 # %ecobits_<id>_formatted_short% - The formatted balance of a certain currency, shortened
 # %ecobits_<id>_commas% - The balance with commas of a certain currency
+# %ecobits_<id>_integer% - The balance as integer of a certain currency
+# %ecobits_<id>_raw% - The raw balance of a certain currency
 # %ecobits_<id>_max% - The max balance of a certain currency
 # %ecobits_<id>_default% - The default balance of a certain currency
 # %ecobits_<id>_name% - The display name of a certain currency
 # %ecobits_<id>_symbol% - The symbol of a certain currency
+# %ecobits_<id>_leaderboard_rank% - The player's rank of a certain currency
 # %ecobits_top_<currency>_<place>_<name/amount>% - The name or balance of the player in a leaderboard position
 # %ecobits_top_<currency>_<place>_<name/amount>_<format-type>% - The name or formatted balance of the player in a leaderboard position
 
@@ -24,20 +27,21 @@
 # short - Shortened balance
 # formatted - Formatted balance (currency.format option)
 # formatted_short - Shortened formatted balance (currency.format_short option)
-# raw/integer - Raw balance
+# integer - Integer balance (ex. a balance of 123.45 becomes 123)
+# raw - Raw balance
 # commas - Deprecated formatted balance
 
 server-id: "main" # Server ID for local currencies over MySQL/MongoDB.
 
 leaderboard:
-  # You can disable the top leaderboard if you don't want it
-  # Please note that it will require a full server restart to take into effect
+  # You can disable the top leaderboard if you don't want it.
+  # Please note that it will require a full server restart to take into effect.
   enabled: true
 
-  # Time in seconds for the lifetime of the leaderboard cache
+  # Time in seconds for the lifetime of the leaderboard cache.
   cache-lifetime: 60
 
-# Shortcut names for short currency format, ordered by magnitude
+# Shortcut names for short currency format, ordered by magnitude.
 shortcuts: ["", "k", "M", "B", "T", "P", "E"]
 
 currencies:
@@ -47,13 +51,15 @@ currencies:
     default: 0 # The default balance.
     max: -1 # The maximum balance, set to -1 if no max.
     payable: false # If players should be able to use /ecobits pay to pay other players
-    decimal: true # If decimal amounts are allowed in commands, rather than just integer amounts
-    vault: false # If this currency should be registered with vault (Only one currency can be registered with vault, requires server restart)
-    local: false # If this currency should not sync between servers
-    format: "&b%symbol% &a%amount% &b%currency%"
-    format-short: "&b%symbol% %amount%"
-    decimal-format: "#,##0.00"
-    decimal-format-short: "#,##0.00"
+    decimal: true # If decimal amounts are allowed in commands, rather than just integer amounts.
+    max-decimals: 2 # How many decimals should we allow the players to type in commands.
+    vault: false # If this currency should be registered with vault. (Only one currency can be registered with vault, requires server restart)
+    local: false # If this currency should not sync between servers.
+    format: "&b%symbol%&a%amount% &b%currency%" # The formatted balance. (Placeholders: %currency%, %amount%, %symbol%)
+    format-short: "&b%symbol% %amount%" # The formatted shortened balance. (Placeholders: %currency%, %amount%, %symbol%)
+    # A tutorial/examples can be found at: https://docs.oracle.com/javase/tutorial/i18n/format/decimalFormat.html
+    decimal-format: "#,##0.00" # The decimal format
+    decimal-format-short: "#,##0.00" # The decimal shortened format
     commands: # A list of commands dedicated to this currency (for easier paying, checking balance, etc.)
       - crystals
       - ecocrystals

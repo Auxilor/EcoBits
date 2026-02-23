@@ -5,6 +5,7 @@ import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
 import com.willfp.ecobits.currencies.hasDecimals
+import com.willfp.ecobits.currencies.numOfDecimals
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -47,6 +48,8 @@ class CommandGivesilent(
         val amount = args[2 + argOffset].toBigDecimalOrNull() ?: return
 
         if (amount.hasDecimals() && !currency.isDecimal) return
+
+        if (amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) return
 
         player.adjustBalance(currency, amount)
     }

@@ -58,8 +58,10 @@ class CommandGet(
                 .replace("%amount_short%", player.getBalance(currency).decimalFormatShort(currency))
                 .replace("%amount_formatted%", player.getBalance(currency).format(currency))
                 .replace("%amount_formatted_short%", player.getBalance(currency).formatShort(currency))
+                .replace("%amount_raw%", player.getBalance(currency).toPlainString())
+                .replace("%amount_integer%", player.getBalance(currency).toInt().toString())
                 .replace("%currency%", currency.name)
-                .replace("%currency_symbol%", currency.symbol)
+                .replace("%symbol%", currency.symbol)
         )
     }
 

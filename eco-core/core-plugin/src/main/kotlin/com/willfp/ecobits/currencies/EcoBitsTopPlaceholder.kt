@@ -39,7 +39,7 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
                     "formatted_short" -> amount.formatShort(currency)
                     "commas" -> amount.formatWithCommas()
                     "integer" -> amount.toInt().toString()
-                    "raw" -> amount.toInt().toString()
+                    "raw" -> amount.toPlainString()
                     else -> amount.decimalFormat(currency)
                 }
             }

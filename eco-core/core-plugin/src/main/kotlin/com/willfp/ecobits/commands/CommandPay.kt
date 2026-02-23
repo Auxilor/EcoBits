@@ -12,6 +12,7 @@ import com.willfp.ecobits.currencies.format
 import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.getBalance
 import com.willfp.ecobits.currencies.hasDecimals
+import com.willfp.ecobits.currencies.numOfDecimals
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -74,6 +75,11 @@ class CommandPay(
             return
         }
 
+        if (amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) {
+            player.sendMessage(plugin.langYml.getMessage("invalid-amount"))
+            return
+        }
+
         if (player.getBalance(currency) < amount) {
             player.sendMessage(plugin.langYml.getMessage("cannot-afford"))
             return
@@ -98,8 +104,10 @@ class CommandPay(
                     .replace("%amount_short%", amount.decimalFormatShort(currency))
                     .replace("%amount_formatted%", amount.format(currency))
                     .replace("%amount_formatted_short%", amount.formatShort(currency))
+                    .replace("%amount_raw%", amount.toPlainString())
+                    .replace("%amount_integer%", amount.toInt().toString())
                     .replace("%currency%", currency.name)
-                    .replace("%currency_symbol%", currency.symbol)
+                    .replace("%symbol%", currency.symbol)
             )
         }
 
@@ -110,8 +118,10 @@ class CommandPay(
                 .replace("%amount_short%", amount.decimalFormatShort(currency))
                 .replace("%amount_formatted%", amount.format(currency))
                 .replace("%amount_formatted_short%", amount.formatShort(currency))
+                .replace("%amount_raw%", amount.toPlainString())
+                .replace("%amount_integer%", amount.toInt().toString())
                 .replace("%currency%", currency.name)
-                .replace("%currency_symbol%", currency.symbol)
+                .replace("%symbol%", currency.symbol)
         )
     }
 

@@ -7,13 +7,14 @@ import com.willfp.ecobits.commands.CommandEcoBits
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.EcoBitsTopPlaceholder
 import com.willfp.ecobits.integrations.IntegrationVault
-import org.bukkit.event.Listener
 
 internal lateinit var plugin: EcoBitsPlugin
     private set
 
 class EcoBitsPlugin : EcoPlugin() {
     val serverID = configYml.getString("server-id")
+
+    val shortcuts = configYml.getStrings("shortcuts")
 
     init {
         plugin = this
@@ -34,10 +35,6 @@ class EcoBitsPlugin : EcoPlugin() {
 
     override fun handleReload() {
         Currencies.update()
-    }
-
-    override fun loadListeners(): List<Listener> {
-        return emptyList()
     }
 
     override fun loadPluginCommands(): List<PluginCommand> {

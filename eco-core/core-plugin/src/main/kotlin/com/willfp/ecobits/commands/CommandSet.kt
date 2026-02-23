@@ -3,9 +3,13 @@ package com.willfp.ecobits.commands
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
+import com.willfp.ecobits.currencies.decimalFormat
+import com.willfp.ecobits.currencies.decimalFormatShort
+import com.willfp.ecobits.currencies.format
+import com.willfp.ecobits.currencies.formatShort
+import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.setBalance
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
@@ -55,20 +59,29 @@ class CommandSet(
             return
         }
 
-        val amount = args[2 + argOffset].toDoubleOrNull()
+        val amount = args[2 + argOffset].toBigDecimalOrNull()
 
         if (amount == null) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-amount"))
             return
         }
 
-        player.setBalance(currency, amount.toBigDecimal())
+        if (amount.hasDecimals() && !currency.isDecimal) {
+            sender.sendMessage(plugin.langYml.getMessage("invalid-amount"))
+            return
+        }
+
+        player.setBalance(currency, amount)
 
         sender.sendMessage(
             plugin.langYml.getMessage("set-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%player%", player.savedDisplayName)
-                .replace("%amount%", amount.toNiceString())
+                .replace("%amount%", amount.decimalFormat(currency))
+                .replace("%amount_short%", amount.decimalFormatShort(currency))
+                .replace("%amount_formatted%", amount.format(currency))
+                .replace("%amount_formatted_short%", amount.formatShort(currency))
                 .replace("%currency%", currency.name)
+                .replace("%currency_symbol%", currency.symbol)
         )
     }
 

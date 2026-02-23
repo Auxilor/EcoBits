@@ -3,13 +3,15 @@ package com.willfp.ecobits.commands
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.core.placeholder.context.placeholderContext
 import com.willfp.eco.util.formatEco
+import com.willfp.eco.util.formatWithCommas
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import com.willfp.ecobits.currencies.Currency
-import com.willfp.ecobits.currencies.formatWithCommas
-import com.willfp.ecobits.currencies.formatWithExtension
+import com.willfp.ecobits.currencies.decimalFormat
+import com.willfp.ecobits.currencies.decimalFormatShort
+import com.willfp.ecobits.currencies.format
+import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -60,9 +62,11 @@ class CommandTop(
 
                 val line = plugin.langYml.getString("top-line-format")
                     .replace("%rank%", (offset + index + 1).toString())
-                    .replace("%balance%", balance.toNiceString())
+                    .replace("%balance%", balance.decimalFormat(currency))
+                    .replace("%balance_short%", balance.decimalFormatShort(currency))
+                    .replace("%balance_formatted%", balance.format(currency))
+                    .replace("%balance_formatted_short%", balance.formatShort(currency))
                     .replace("%balance_commas%", balance.formatWithCommas())
-                    .replace("%balance_formatted%", balance.formatWithExtension())
                     .replace("%balance_integer%", balance.toInt().toString())
                     .replace("%player%", player.savedDisplayName)
 

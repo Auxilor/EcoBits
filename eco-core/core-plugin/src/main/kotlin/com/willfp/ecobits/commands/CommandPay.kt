@@ -3,18 +3,21 @@ package com.willfp.ecobits.commands
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
+import com.willfp.ecobits.currencies.decimalFormat
+import com.willfp.ecobits.currencies.decimalFormatShort
+import com.willfp.ecobits.currencies.format
+import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
-import kotlin.math.ceil
-import kotlin.math.floor
+import java.math.BigDecimal
 
 class CommandPay(
     private val currency: Currency? = null
@@ -59,49 +62,56 @@ class CommandPay(
             return
         }
 
-        val amount = args[2 + argOffset].toDoubleOrNull()
+        val amount = args[2 + argOffset].toBigDecimalOrNull()
 
-        if (amount == null || amount <= 0) {
+        if (amount == null || amount <= BigDecimal.ZERO) {
             player.sendMessage(plugin.langYml.getMessage("invalid-amount"))
             return
         }
 
-        if (ceil(amount) != floor(amount) && !currency.isDecimal) {
+        if (amount.hasDecimals() && !currency.isDecimal) {
             player.sendMessage(plugin.langYml.getMessage("invalid-amount"))
             return
         }
 
-        if (player.getBalance(currency) < amount.toBigDecimal()) {
+        if (player.getBalance(currency) < amount) {
             player.sendMessage(plugin.langYml.getMessage("cannot-afford"))
             return
         }
 
         if (currency.max != null) {
-            if (recipient.getBalance(currency) + amount.toBigDecimal() > currency.max) {
+            if (recipient.getBalance(currency) + amount > currency.max) {
                 player.sendMessage(plugin.langYml.getMessage("too-much"))
                 return
             }
         }
 
-        recipient.adjustBalance(currency, amount.toBigDecimal())
-        player.adjustBalance(currency, -amount.toBigDecimal())
+        recipient.adjustBalance(currency, amount)
+        player.adjustBalance(currency, -amount)
 
         // Send a message to recipient if connected
         if (recipient.isOnline) {
             (recipient.player as Player).sendMessage(
                 plugin.langYml.getMessage("received-money", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                     .replace("%player%", player.savedDisplayName)
-                    .replace("%amount%", amount.toNiceString())
+                    .replace("%amount%", amount.decimalFormat(currency))
+                    .replace("%amount_short%", amount.decimalFormatShort(currency))
+                    .replace("%amount_formatted%", amount.format(currency))
+                    .replace("%amount_formatted_short%", amount.formatShort(currency))
                     .replace("%currency%", currency.name)
+                    .replace("%currency_symbol%", currency.symbol)
             )
         }
-
 
         player.sendMessage(
             plugin.langYml.getMessage("paid-player", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%player%", recipient.savedDisplayName)
-                .replace("%amount%", amount.toNiceString())
+                .replace("%amount%", amount.decimalFormat(currency))
+                .replace("%amount_short%", amount.decimalFormatShort(currency))
+                .replace("%amount_formatted%", amount.format(currency))
+                .replace("%amount_formatted_short%", amount.formatShort(currency))
                 .replace("%currency%", currency.name)
+                .replace("%currency_symbol%", currency.symbol)
         )
     }
 

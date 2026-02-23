@@ -3,9 +3,12 @@ package com.willfp.ecobits.commands
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
+import com.willfp.ecobits.currencies.decimalFormat
+import com.willfp.ecobits.currencies.decimalFormatShort
+import com.willfp.ecobits.currencies.format
+import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.setBalance
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
@@ -62,8 +65,12 @@ class CommandReset(
             sender.sendMessage(
                 plugin.langYml.getMessage("reset-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                     .replace("%player%", player.savedDisplayName)
-                    .replace("%amount%", currency.default.toNiceString())
+                    .replace("%amount%", currency.default.decimalFormat(currency))
+                    .replace("%amount_short%", currency.default.decimalFormatShort(currency))
+                    .replace("%amount_formatted%", currency.default.format(currency))
+                    .replace("%amount_formatted_short%", currency.default.formatShort(currency))
                     .replace("%currency%", currency.name)
+                    .replace("%currency_symbol%", currency.symbol)
             )
         }
     }
@@ -77,8 +84,12 @@ class CommandReset(
 
         sender.sendMessage(
             plugin.langYml.getMessage("reset-all-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .replace("%amount%", currency.default.toNiceString())
+                .replace("%amount%", currency.default.decimalFormat(currency))
+                .replace("%amount_short%", currency.default.decimalFormatShort(currency))
+                .replace("%amount_formatted%", currency.default.format(currency))
+                .replace("%amount_formatted_short%", currency.default.formatShort(currency))
                 .replace("%currency%", currency.name)
+                .replace("%currency_symbol%", currency.symbol)
         )
     }
 

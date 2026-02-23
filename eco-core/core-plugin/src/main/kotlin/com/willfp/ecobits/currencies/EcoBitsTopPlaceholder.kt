@@ -5,12 +5,12 @@ import com.willfp.eco.core.placeholder.RegistrablePlaceholder
 import com.willfp.eco.core.placeholder.context.PlaceholderContext
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import java.util.regex.Pattern
 
 object EcoBitsTopPlaceholder : RegistrablePlaceholder {
-    private val pattern = Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|integer))?")
+    private val pattern =
+        Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|integer|short|formatted_short))?")
 
     override fun getPattern(): Pattern = pattern
     override fun getPlugin(): EcoPlugin = com.willfp.ecobits.plugin
@@ -34,10 +34,12 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
             "amount" -> {
                 val amount = topEntry.amount
                 when (formatType) {
+                    "short" -> amount.decimalFormatShort(currency)
+                    "formatted" -> amount.format(currency)
+                    "formatted_short" -> amount.formatShort(currency)
                     "commas" -> amount.formatWithCommas()
-                    "formatted" -> amount.formatWithExtension()
                     "integer" -> amount.toInt().toString()
-                    else -> amount.toNiceString()
+                    else -> amount.decimalFormat(currency)
                 }
             }
 

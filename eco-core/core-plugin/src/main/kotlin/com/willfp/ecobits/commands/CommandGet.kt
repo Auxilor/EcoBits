@@ -3,9 +3,12 @@ package com.willfp.ecobits.commands
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
+import com.willfp.ecobits.currencies.decimalFormat
+import com.willfp.ecobits.currencies.decimalFormatShort
+import com.willfp.ecobits.currencies.format
+import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.getBalance
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
@@ -51,8 +54,12 @@ class CommandGet(
         sender.sendMessage(
             plugin.langYml.getMessage("other-balance", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%player%", player.savedDisplayName)
-                .replace("%amount%", player.getBalance(currency).toNiceString())
+                .replace("%amount%", player.getBalance(currency).decimalFormat(currency))
+                .replace("%amount_short%", player.getBalance(currency).decimalFormatShort(currency))
+                .replace("%amount_formatted%", player.getBalance(currency).format(currency))
+                .replace("%amount_formatted_short%", player.getBalance(currency).formatShort(currency))
                 .replace("%currency%", currency.name)
+                .replace("%currency_symbol%", currency.symbol)
         )
     }
 

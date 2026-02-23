@@ -72,7 +72,7 @@ class CommandTake(
             return
         }
 
-        if (amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) {
+        if (currency.maxDecimals != null && amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-amount"))
             return
         }

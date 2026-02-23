@@ -55,7 +55,7 @@ open class Currency(
 
     val maxDecimals = if (config.has("max-decimals") && config.getInt("max-decimals") > 0)
         config.getInt("max-decimals")
-    else 0
+    else null
 
     val isRegisteredWithVault = config.getBool("vault")
 

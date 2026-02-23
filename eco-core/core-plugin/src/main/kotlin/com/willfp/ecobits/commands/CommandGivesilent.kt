@@ -49,7 +49,7 @@ class CommandGivesilent(
 
         if (amount.hasDecimals() && !currency.isDecimal) return
 
-        if (amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) return
+        if (currency.maxDecimals != null && amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) return
 
         player.adjustBalance(currency, amount)
     }

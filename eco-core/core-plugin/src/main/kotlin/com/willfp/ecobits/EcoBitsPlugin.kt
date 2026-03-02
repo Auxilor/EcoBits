@@ -7,14 +7,18 @@ import com.willfp.eco.core.integrations.IntegrationLoader
 import com.willfp.eco.util.ClassUtils
 import com.willfp.ecobits.commands.CommandEcoBits
 import com.willfp.ecobits.currencies.Currencies
+import com.willfp.ecobits.currencies.EcoBitsTopPlaceholder
 import com.willfp.ecobits.integrations.IntegrationVault
 import org.bukkit.event.Listener
+
+internal lateinit var plugin: EcoBitsPlugin
+    private set
 
 class EcoBitsPlugin : EcoPlugin() {
     val serverID = configYml.getString("server-id")
 
     init {
-        instance = this
+        plugin = this
     }
 
     override fun handleLoad() {
@@ -23,6 +27,11 @@ class EcoBitsPlugin : EcoPlugin() {
             IntegrationVault.isVaultPresent = true
             Currencies.update(this)
         }
+    }
+
+    override fun handleEnable() {
+        if (this.configYml.getBool("leaderboard.enabled"))
+            EcoBitsTopPlaceholder(this).register()
     }
 
     override fun handleReload() {
@@ -43,11 +52,6 @@ class EcoBitsPlugin : EcoPlugin() {
     @Suppress("REMOVAL")
     override fun getMinimumEcoVersion(): String {
         return "6.77.0"
-    }
-
-    companion object {
-        @JvmStatic
-        lateinit var instance: EcoBitsPlugin
     }
 }
 

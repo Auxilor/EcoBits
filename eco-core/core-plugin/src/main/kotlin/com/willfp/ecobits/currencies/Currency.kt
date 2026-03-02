@@ -7,26 +7,25 @@ import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
-import com.willfp.eco.core.integrations.economy.EconomyManager
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
-import com.willfp.eco.core.placeholder.DynamicPlaceholder
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
-import com.willfp.eco.util.savedDisplayName
 import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
+import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getPosition
+import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import com.willfp.ecobits.integrations.IntegrationVault
+import com.willfp.ecobits.util.LeaderboardEntry
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.math.BigDecimal
 import java.text.DecimalFormat
-import java.time.Duration
-import java.util.Optional
-import java.util.regex.Pattern
+import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -36,9 +35,18 @@ class Currency(
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
-    val leaderboardCache = Caffeine.newBuilder()
-        .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("cache-expire-after").toLong()))
-        .build<Int, Optional<LeaderboardPlace>>()
+
+    fun getTop(position: Int): LeaderboardEntry? {
+        return getTop(this, position)
+    }
+
+    fun getPosition(uuid: UUID): Int? {
+        return getPosition(this, uuid)
+    }
+
+    private val descCache = Caffeine.newBuilder()
+        .expireAfterWrite(plugin.configYml.getInt("gui.cache-ttl").toLong(), TimeUnit.MILLISECONDS)
+        .build<Int, String>()
 
     val default = BigDecimal(config.getDouble("default"))
 
@@ -56,6 +64,8 @@ class Currency(
 
     val isLocal = config.getBool("local")
 
+    val hasShortBalanceCommand = config.getBool("balance-shorthand")
+
     val commands = config.getStrings("commands").map { DynamicCurrencyCommand(plugin, it, this) }
 
     val key = PersistentDataKey(
@@ -63,17 +73,6 @@ class Currency(
         PersistentDataKeyType.BIG_DECIMAL,
         default
     )
-
-    fun getLeaderboardPlace(place: Int): LeaderboardPlace? {
-        return leaderboardCache.get(place) {
-            val top = Bukkit.getOfflinePlayers()
-                .sortedByDescending { it.getBalance(this) }.getOrNull(place - 1)
-
-            if (top == null) {
-                Optional.empty()
-            } else Optional.of(LeaderboardPlace(top, top.getBalance(this)))
-        }.orElse(null)
-    }
 
     private fun registerCommands() {
         this.commands.forEach { it.register() }
@@ -84,34 +83,6 @@ class Currency(
     }
 
     init {
-        PlaceholderManager.registerPlaceholder(
-            DynamicPlaceholder(
-                plugin,
-                Pattern.compile("top_${id}_[0-9]+_[a-z]+_?[a-z]*"),
-            ) { value ->
-                val place = value.split("_").getOrNull(2)
-                    ?.toIntOrNull() ?: return@DynamicPlaceholder ""
-
-                val type = value.split("_").getOrNull(3)
-                    ?: return@DynamicPlaceholder ""
-
-                val raw = value.split("_").getOrNull(4)
-                    ?.equals("raw", true) ?: true
-
-                val placeObj = getLeaderboardPlace(place)
-
-                return@DynamicPlaceholder when (type) {
-                    "name" -> placeObj?.player?.savedDisplayName
-                        ?: plugin.langYml.getFormattedString("top.name-empty")
-
-                    "amount" -> (if (raw) placeObj?.amount.toNiceString() else placeObj?.amount?.formatWithExtension())
-                        ?: plugin.langYml.getFormattedString("top.amount-empty")
-
-                    else -> ""
-                }
-            }
-        )
-
         PlaceholderManager.registerPlaceholder(
             PlayerPlaceholder(
                 plugin,
@@ -148,6 +119,19 @@ class Currency(
             }
         )
 
+        if (plugin.configYml.getBool("leaderboard.enabled"))
+            PlaceholderManager.registerPlaceholder(
+                PlayerPlaceholder(
+                    plugin,
+                    "${id}_leaderboard_rank"
+                )
+                { player ->
+                    val emptyPosition = plugin.langYml.getString("top.empty-position")
+                    val position = getPosition(player.uniqueId)
+                    position?.toString() ?: emptyPosition
+                }.register()
+            )
+
         PlaceholderManager.registerPlaceholder(
             PlayerlessPlaceholder(
                 plugin,
@@ -181,6 +165,9 @@ class Currency(
         this.registerCommands()
     }
 
+    internal open fun getBalance(player: OfflinePlayer) = getSavedBalance(player)
+    internal fun getSavedBalance(player: OfflinePlayer) = player.profile.read(key)
+
     override fun equals(other: Any?): Boolean {
         return other is Currency && other.id == this.id
     }
@@ -189,11 +176,6 @@ class Currency(
         return this.id.hashCode()
     }
 }
-
-data class LeaderboardPlace(
-    val player: OfflinePlayer,
-    val amount: BigDecimal
-)
 
 fun BigDecimal.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')

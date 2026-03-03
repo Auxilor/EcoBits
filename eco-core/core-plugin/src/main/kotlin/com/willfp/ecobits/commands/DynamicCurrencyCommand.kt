@@ -4,6 +4,7 @@ import com.willfp.eco.core.command.impl.PluginCommand
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 class DynamicCurrencyCommand(
     label: String,
@@ -14,6 +15,9 @@ class DynamicCurrencyCommand(
     "ecobits.command.${currency.id}",
     false
 ) {
+    private val balanceCommand = if (this.currency.hasShortBalanceCommand) CommandBalance(this.currency)
+        else null
+
     init {
         this.addSubcommand(CommandGive(currency))
             .addSubcommand(CommandGivesilent(currency))
@@ -21,7 +25,7 @@ class DynamicCurrencyCommand(
             .addSubcommand(CommandSet(currency))
             .addSubcommand(CommandReset(currency))
             .addSubcommand(CommandPay(currency))
-            .addSubcommand(CommandBalance(currency))
+            .addSubcommand(balanceCommand ?: CommandBalance(currency))
             .addSubcommand(CommandTake(currency))
             .addSubcommand(CommandTakesilent(currency))
         if (plugin.configYml.getBool("leaderboard.enabled"))
@@ -29,8 +33,12 @@ class DynamicCurrencyCommand(
     }
 
     override fun onExecute(sender: CommandSender, args: MutableList<String>) {
-        sender.sendMessage(
-            plugin.langYml.getMessage("invalid-command")
-        )
+        if (balanceCommand != null && sender is Player) {
+            balanceCommand.onExecute(sender, args)
+        } else {
+            sender.sendMessage(
+                plugin.langYml.getMessage("invalid-command")
+            )
+        }
     }
 }

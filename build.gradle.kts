@@ -6,12 +6,10 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("com.gradleup.shadow") version "9.3.1"
-    id("com.willfp.libreforge-gradle-plugin") version "1.0.3"
 }
 
 group = "com.willfp"
 version = findProperty("version")!!
-val libreforgeVersion = findProperty("libreforge-version")
 
 base {
     archivesName.set(project.name)
@@ -41,7 +39,7 @@ allprojects {
     }
 
     dependencies {
-        compileOnly("com.willfp:eco:6.77.3")
+        compileOnly("com.willfp:eco:6.77.5")
         compileOnly("org.jetbrains:annotations:26.0.2")
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
         compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
@@ -76,7 +74,6 @@ allprojects {
             filesMatching(listOf("**plugin.yml", "**eco.yml")) {
                 expand(
                     "version" to project.version,
-                    "libreforgeVersion" to libreforgeVersion!!,
                     "pluginName" to rootProject.name
                 )
             }

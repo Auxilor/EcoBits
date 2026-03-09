@@ -161,7 +161,7 @@ open class Currency(
                     val emptyPosition = plugin.langYml.getString("top.empty-position")
                     val position = getPosition(player.uniqueId)
                     position?.toString() ?: emptyPosition
-                }.register()
+                }
             )
 
         PlaceholderManager.registerPlaceholder(

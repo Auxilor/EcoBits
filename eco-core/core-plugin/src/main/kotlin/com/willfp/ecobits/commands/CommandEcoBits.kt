@@ -1,23 +1,27 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.PluginCommand
+import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 
-class CommandEcoBits(plugin: EcoPlugin) : PluginCommand(plugin, "ecobits", "ecobits.command.ecobits", false) {
+object CommandEcoBits : PluginCommand(
+    plugin, "ecobits",
+    "ecobits.command.ecobits",
+    false
+) {
     init {
-        this.addSubcommand(CommandReload(plugin))
-            .addSubcommand(CommandGive(plugin))
-            .addSubcommand(CommandGivesilent(plugin))
-            .addSubcommand(CommandGet(plugin))
-            .addSubcommand(CommandSet(plugin))
-            .addSubcommand(CommandReset(plugin))
-            .addSubcommand(CommandPay(plugin))
-            .addSubcommand(CommandBalance(plugin))
-            .addSubcommand(CommandTake(plugin))
-            .addSubcommand(CommandTakesilent(plugin))
+        this.addSubcommand(CommandReload)
+            .addSubcommand(CommandGive())
+            .addSubcommand(CommandGivesilent())
+            .addSubcommand(CommandGet())
+            .addSubcommand(CommandSet())
+            .addSubcommand(CommandReset())
+            .addSubcommand(CommandPay())
+            .addSubcommand(CommandBalance())
+            .addSubcommand(CommandTake())
+            .addSubcommand(CommandTakesilent())
         if (plugin.configYml.getBool("leaderboard.enabled"))
-            this.addSubcommand(CommandTop(plugin))
+            this.addSubcommand(CommandTop())
     }
 
     override fun onExecute(sender: CommandSender, args: List<String>) {

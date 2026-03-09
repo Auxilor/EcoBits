@@ -5,16 +5,15 @@ import com.willfp.eco.core.placeholder.RegistrablePlaceholder
 import com.willfp.eco.core.placeholder.context.PlaceholderContext
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
+import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import java.util.regex.Pattern
 
-class EcoBitsTopPlaceholder(
-    private val plugin: EcoPlugin
-) : RegistrablePlaceholder {
-    private val pattern = Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|integer))?")
+object EcoBitsTopPlaceholder : RegistrablePlaceholder {
+    private val pattern =
+        Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|raw|integer|short|formatted_short))?")
 
     override fun getPattern(): Pattern = pattern
-    override fun getPlugin(): EcoPlugin = plugin
+    override fun getPlugin(): EcoPlugin = com.willfp.ecobits.plugin
 
     override fun getValue(params: String, ctx: PlaceholderContext): String? {
         val emptyPosition: String = plugin.langYml.getString("top.empty-position")
@@ -31,14 +30,17 @@ class EcoBitsTopPlaceholder(
         val topEntry = currency.getTop(place) ?: return emptyPosition
 
         return when (type) {
-            "name" -> topEntry.player?.savedDisplayName ?: emptyPosition
+            "name" -> topEntry.player.savedDisplayName
             "amount" -> {
                 val amount = topEntry.amount
                 when (formatType) {
+                    "short" -> amount.decimalFormatShort(currency)
+                    "formatted" -> amount.format(currency)
+                    "formatted_short" -> amount.formatShort(currency)
                     "commas" -> amount.formatWithCommas()
-                    "formatted" -> amount.formatWithExtension()
                     "integer" -> amount.toInt().toString()
-                    else -> amount.toNiceString()
+                    "raw" -> amount.toPlainString()
+                    else -> amount.decimalFormat(currency)
                 }
             }
 

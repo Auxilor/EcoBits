@@ -11,38 +11,29 @@ import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
-import com.willfp.eco.util.toNiceString
+import com.willfp.eco.util.formatWithCommas
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
 import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getPosition
-import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import com.willfp.ecobits.integrations.IntegrationVault
-import com.willfp.ecobits.util.LeaderboardEntry
+import com.willfp.ecobits.plugin
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.DecimalFormat
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 
-class Currency(
+open class Currency(
     val id: String,
     val plugin: EcoBitsPlugin,
     val config: Config
 ) {
-
-    fun getTop(position: Int): LeaderboardEntry? {
-        return getTop(this, position)
-    }
-
-    fun getPosition(uuid: UUID): Int? {
-        return getPosition(this, uuid)
-    }
 
     private val descCache = Caffeine.newBuilder()
         .expireAfterWrite(plugin.configYml.getInt("gui.cache-ttl").toLong(), TimeUnit.MILLISECONDS)
@@ -52,6 +43,8 @@ class Currency(
 
     val name = config.getFormattedString("name")
 
+    val symbol = config.getFormattedString("symbol")
+
     val max: BigDecimal? = if (config.has("max") && config.getDouble("max") > 0)
         BigDecimal(config.getDouble("max"))
     else null
@@ -60,19 +53,31 @@ class Currency(
 
     val isDecimal = config.getBool("decimal")
 
+    val maxDecimals = if (config.has("max-decimals") && config.getInt("max-decimals") > 0)
+        config.getInt("max-decimals")
+    else null
+
     val isRegisteredWithVault = config.getBool("vault")
 
     val isLocal = config.getBool("local")
 
     val hasShortBalanceCommand = config.getBool("balance-shorthand")
 
-    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(plugin, it, this) }
+    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(it, this) }
 
     val key = PersistentDataKey(
         plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),
         PersistentDataKeyType.BIG_DECIMAL,
         default
     )
+
+    val format = config.getFormattedString("format")
+
+    val formatShort = config.getFormattedString("format-short")
+
+    val decimalFormat = DecimalFormat(config.getString("decimal-format"))
+
+    val decimalFormatShort = DecimalFormat(config.getString("decimal-format-short"))
 
     private fun registerCommands() {
         this.commands.forEach { it.register() }
@@ -88,7 +93,43 @@ class Currency(
                 plugin,
                 id
             ) {
-                it.getBalance(this).toNiceString()
+                it.getBalance(this).decimalFormat(this)
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
+                "${id}_short"
+            ) {
+                it.getBalance(this).decimalFormatShort(this)
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
+                "${id}_formatted"
+            ) {
+                it.getBalance(this).format(this)
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
+                "${id}_formatted_short"
+            ) {
+                it.getBalance(this).formatShort(this)
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerPlaceholder(
+                plugin,
+                "${id}_raw"
+            ) {
+                it.getBalance(this).toPlainString()
             }
         )
 
@@ -98,15 +139,6 @@ class Currency(
                 "${id}_commas"
             ) {
                 it.getBalance(this).formatWithCommas()
-            }
-        )
-
-        PlaceholderManager.registerPlaceholder(
-            PlayerPlaceholder(
-                plugin,
-                "${id}_formatted"
-            ) {
-                it.getBalance(this).formatWithExtension()
             }
         )
 
@@ -129,7 +161,7 @@ class Currency(
                     val emptyPosition = plugin.langYml.getString("top.empty-position")
                     val position = getPosition(player.uniqueId)
                     position?.toString() ?: emptyPosition
-                }.register()
+                }
             )
 
         PlaceholderManager.registerPlaceholder(
@@ -147,6 +179,15 @@ class Currency(
                 "${id}_max"
             ) {
                 this.max.toString()
+            }
+        )
+
+        PlaceholderManager.registerPlaceholder(
+            PlayerlessPlaceholder(
+                plugin,
+                "${id}_symbol"
+            ) {
+                this.symbol
             }
         )
 
@@ -177,6 +218,17 @@ class Currency(
     }
 }
 
+fun BigDecimal.hasDecimals(): Boolean {
+    return this.setScale(0, RoundingMode.CEILING) != this.setScale(0, RoundingMode.FLOOR)
+}
+
+fun BigDecimal.numOfDecimals(): Int {
+    val plain = this.stripTrailingZeros().toPlainString()
+    val index = plain.indexOf('.')
+    return if (index < 0) 0 else plain.length - index - 1
+}
+
+@Deprecated("Deprecated")
 fun BigDecimal.formatWithExtension(): String {
     val suffix = charArrayOf(' ', 'k', 'M', 'B', 'T', 'P', 'E')
     val numValue = this.toLong()
@@ -191,10 +243,36 @@ fun BigDecimal.formatWithExtension(): String {
     }
 }
 
-fun BigDecimal.formatWithCommas(): String {
+fun BigDecimal.format(currency: Currency): String {
+    return currency.format
+        .replace("%amount%", this.decimalFormat(currency))
+        .replace("%currency%", currency.name)
+        .replace("%symbol%", currency.symbol)
+}
+
+fun BigDecimal.formatShort(currency: Currency): String {
+    return currency.formatShort
+        .replace("%amount%", this.decimalFormatShort(currency))
+        .replace("%currency%", currency.name)
+        .replace("%symbol%", currency.symbol)
+}
+
+fun BigDecimal.decimalFormat(currency: Currency): String {
     val stripped = this.stripTrailingZeros()
-    val decimalFormat = if (stripped.scale() > 0) DecimalFormat("#,##0.00") else DecimalFormat("#,##0")
-    return decimalFormat.format(stripped)
+    return currency.decimalFormat.format(stripped)
+}
+
+fun BigDecimal.decimalFormatShort(currency: Currency): String {
+    val numValue = this.toLong()
+    val value = floor(log10(numValue.toDouble())).toInt()
+
+    val base = value / 3
+
+    return if (value >= 3 && base < plugin.shortcuts.size) {
+        currency.decimalFormatShort.format(numValue / 10.0.pow((base * 3).toDouble())) + plugin.shortcuts[base]
+    } else {
+        currency.decimalFormatShort.format(numValue)
+    }
 }
 
 fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {

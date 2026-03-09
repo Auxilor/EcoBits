@@ -2,11 +2,11 @@ package com.willfp.ecobits.currencies
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.willfp.ecobits.plugin
-import com.willfp.ecobits.util.LeaderboardEntry
 import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
+import java.math.BigDecimal
 import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 object CurrenciesLeaderboard {
     private var leaderboardCache = Caffeine.newBuilder()
@@ -21,22 +21,27 @@ object CurrenciesLeaderboard {
             return@build top
         }
 
-    fun getTop(currency: Currency, position: Int): LeaderboardEntry? {
+    fun Currency.getTop(position: Int): LeaderboardEntry? {
         require(position > 0) { "Position must be greater than 0" }
 
-        val uuid = leaderboardCache.get(true)[currency]?.getOrNull(position - 1) ?: return null
+        val uuid = leaderboardCache.get(true)[this]?.getOrNull(position - 1) ?: return null
 
         val player = Bukkit.getOfflinePlayer(uuid).takeIf { it.hasPlayedBefore() } ?: return null
 
         return LeaderboardEntry(
             player,
-            player.getBalance(currency)
+            player.getBalance(this)
         )
     }
 
-    fun getPosition(currency: Currency, uuid: UUID): Int? {
-        val leaderboard = leaderboardCache.get(true)[currency]
+    fun Currency.getPosition(uuid: UUID): Int? {
+        val leaderboard = leaderboardCache.get(true)[this]
         val index = leaderboard?.indexOf(uuid)
         return if (index == -1) null else index?.plus(1)
     }
+
+    data class LeaderboardEntry(
+        val player: OfflinePlayer,
+        val amount: BigDecimal
+    )
 }

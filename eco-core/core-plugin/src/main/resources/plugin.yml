@@ -1,5 +1,5 @@
-name: EcoBits
-version: ${projectVersion}
+name: ${pluginName}
+version: ${version}
 main: com.willfp.ecobits.EcoBitsPlugin
 api-version: 1.17
 authors: [ Auxilor ]
@@ -8,6 +8,7 @@ load: STARTUP
 depend:
   - eco
 softdepend:
+  - libreforge
   - Vault
 
 commands:

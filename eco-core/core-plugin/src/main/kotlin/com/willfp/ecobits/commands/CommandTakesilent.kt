@@ -1,19 +1,17 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.savedDisplayName
-import com.willfp.eco.util.toNiceString
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
+import com.willfp.ecobits.currencies.hasDecimals
+import com.willfp.ecobits.currencies.numOfDecimals
+import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
 
 class CommandTakesilent(
-    plugin: EcoPlugin,
     private val currency: Currency? = null
 ) : Subcommand(
     plugin,
@@ -47,9 +45,13 @@ class CommandTakesilent(
             return
         }
 
-        val amount = args[2 + argOffset].toDoubleOrNull() ?: return
+        val amount = args[2 + argOffset].toBigDecimalOrNull() ?: return
 
-        player.adjustBalance(currency, -amount.toBigDecimal())
+        if (amount.hasDecimals() && !currency.isDecimal) return
+
+        if (currency.maxDecimals != null && amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) return
+
+        player.adjustBalance(currency, -amount)
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {

@@ -3,7 +3,7 @@ package com.willfp.ecobits.currencies
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableList
-import com.willfp.ecobits.EcoBitsPlugin
+import com.willfp.ecobits.plugin
 
 object Currencies {
     private val BY_ID: BiMap<String, Currency> = HashBiMap.create()
@@ -31,11 +31,9 @@ object Currencies {
 
     /**
      * Update all [Currency]s.
-     *
-     * @param plugin Instance of EcoBits.
      */
     @JvmStatic
-    fun update(plugin: EcoBitsPlugin) {
+    fun update() {
         for (currency in values()) {
             removeCurrency(currency)
         }

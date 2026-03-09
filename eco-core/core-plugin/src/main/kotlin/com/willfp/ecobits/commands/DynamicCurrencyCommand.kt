@@ -1,13 +1,12 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.PluginCommand
 import com.willfp.ecobits.currencies.Currency
+import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class DynamicCurrencyCommand(
-    plugin: EcoPlugin,
     label: String,
     val currency: Currency
 ) : PluginCommand(
@@ -16,21 +15,21 @@ class DynamicCurrencyCommand(
     "ecobits.command.${currency.id}",
     false
 ) {
-    private val balanceCommand = if (this.currency.hasShortBalanceCommand) CommandBalance(this.plugin, this.currency)
+    private val balanceCommand = if (this.currency.hasShortBalanceCommand) CommandBalance(this.currency)
         else null
 
     init {
-        this.addSubcommand(CommandGive(plugin, currency))
-            .addSubcommand(CommandGivesilent(plugin, currency))
-            .addSubcommand(CommandGet(plugin, currency))
-            .addSubcommand(CommandSet(plugin, currency))
-            .addSubcommand(CommandReset(plugin, currency))
-            .addSubcommand(CommandPay(plugin, currency))
-            .addSubcommand(balanceCommand ?: CommandBalance(plugin, currency))
-            .addSubcommand(CommandTake(plugin, currency))
-            .addSubcommand(CommandTakesilent(plugin, currency))
+        this.addSubcommand(CommandGive(currency))
+            .addSubcommand(CommandGivesilent(currency))
+            .addSubcommand(CommandGet(currency))
+            .addSubcommand(CommandSet(currency))
+            .addSubcommand(CommandReset(currency))
+            .addSubcommand(CommandPay(currency))
+            .addSubcommand(balanceCommand ?: CommandBalance(currency))
+            .addSubcommand(CommandTake(currency))
+            .addSubcommand(CommandTakesilent(currency))
         if (plugin.configYml.getBool("leaderboard.enabled"))
-            this.addSubcommand(CommandTop(plugin, currency))
+            this.addSubcommand(CommandTop(currency))
     }
 
     override fun onExecute(sender: CommandSender, args: MutableList<String>) {

@@ -1,18 +1,21 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.toNiceString
+import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
+import com.willfp.ecobits.currencies.decimalFormat
+import com.willfp.ecobits.currencies.decimalFormatShort
+import com.willfp.ecobits.currencies.format
+import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
 
 class CommandBalance(
-    plugin: EcoPlugin,
     private val currency: Currency? = null
 ) : Subcommand(
     plugin,
@@ -37,8 +40,13 @@ class CommandBalance(
 
         player.sendMessage(
             plugin.langYml.getMessage("balance", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .replace("%amount%", player.getBalance(currency).toNiceString())
+                .replace("%player%", player.savedDisplayName)
+                .replace("%amount%", player.getBalance(currency).decimalFormat(currency))
+                .replace("%amount_short%", player.getBalance(currency).decimalFormatShort(currency))
+                .replace("%amount_formatted%", player.getBalance(currency).format(currency))
+                .replace("%amount_formatted_short%", player.getBalance(currency).formatShort(currency))
                 .replace("%currency%", currency.name)
+                .replace("%currency_symbol%", currency.symbol)
         )
     }
 
@@ -47,7 +55,7 @@ class CommandBalance(
 
         if (this.currency == null) {
             if (args.isEmpty()) {
-                Currencies.values().map { it.id }
+                return Currencies.values().map { it.id }
             }
 
             if (args.size == 1) {

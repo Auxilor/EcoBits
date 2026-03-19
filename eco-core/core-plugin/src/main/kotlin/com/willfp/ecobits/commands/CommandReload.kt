@@ -3,6 +3,9 @@ package com.willfp.ecobits.commands
 import com.willfp.eco.core.command.impl.Subcommand
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.toNiceString
+import com.willfp.ecobits.EcoBitsPlugin
+import com.willfp.ecobits.currencies.Currencies
+import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 
@@ -16,6 +19,7 @@ object CommandReload : Subcommand(
         sender.sendMessage(
             plugin.langYml.getMessage("reloaded", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%time%", plugin.reloadWithTime().toNiceString())
+                .replace("%count%", Currencies.values().size.toString())
         )
     }
 }

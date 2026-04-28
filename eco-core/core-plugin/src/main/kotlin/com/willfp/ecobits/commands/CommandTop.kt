@@ -28,11 +28,11 @@ class CommandTop(
     private val argOffset = if (currency == null) 0 else -1
 
     override fun onExecute(sender: CommandSender, args: List<String>) {
-        plugin.scheduler.runTaskAsync {
+        plugin.scheduler.runAsync {
             val currency = if (this.currency == null) {
                 if (args.isEmpty()) {
                     sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-                    return@runTaskAsync
+                    return@runAsync
                 }
                 Currencies.getByID(args[0].lowercase())
             } else {
@@ -41,7 +41,7 @@ class CommandTop(
 
             if (currency == null) {
                 sender.sendMessage(plugin.langYml.getMessage("invalid-currency"))
-                return@runTaskAsync
+                return@runAsync
             }
 
             val page = if (args.size > 1 + argOffset) {

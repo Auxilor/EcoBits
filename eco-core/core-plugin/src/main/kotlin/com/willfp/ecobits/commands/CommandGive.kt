@@ -33,13 +33,14 @@ class CommandGive(
             return
         }
 
-        @Suppress("DEPRECATION")
-        val player = Bukkit.getOfflinePlayer(args[0])
-
-        if (!player.hasPlayedBefore()) {
-            sender.sendMessage(plugin.langYml.getMessage("invalid-player"))
-            return
-        }
+        val player = Bukkit.getPlayer(args[0])
+            ?: Bukkit.getOfflinePlayers().firstOrNull {
+                it.name.equals(args[0], ignoreCase = true)
+            }
+            ?: run {
+                sender.sendMessage(plugin.langYml.getMessage("invalid-player"))
+                return
+            }
 
         if (this.currency == null) {
             if (args.size < 2) {

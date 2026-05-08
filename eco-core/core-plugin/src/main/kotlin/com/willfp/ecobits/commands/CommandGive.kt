@@ -34,9 +34,7 @@ class CommandGive(
         }
 
         val player = Bukkit.getPlayer(args[0])
-            ?: Bukkit.getOfflinePlayers().firstOrNull {
-                it.name.equals(args[0], ignoreCase = true)
-            }
+            ?: Bukkit.getOfflinePlayerIfCached(args[0])
             ?: run {
                 sender.sendMessage(plugin.langYml.getMessage("invalid-player"))
                 return

@@ -3,6 +3,12 @@ title: "Plugin Config"
 sidebar_position: 4
 ---
 
+This is the main `config.yml` for EcoBits, found at `/plugins/EcoBits/config.yml`. It holds your currency definitions plus the global settings for the leaderboard and number shortcuts. Edit it, then run `/ecobits reload` to apply your changes.
+
+:::warning
+Toggling `leaderboard.enabled` and changing a currency's `vault` setting both need a full server restart, not just `/ecobits reload`, before they take effect.
+:::
+
 ## Default config.yml
 
 ```yaml
@@ -34,38 +40,39 @@ sidebar_position: 4
 # raw - Raw balance
 # commas - Deprecated formatted balance
 
-server-id: "main" # Server ID for local currencies over MySQL/MongoDB.
+server-id: "main" # Server ID for local currencies over MySQL/MongoDB
 
 leaderboard:
-  # You can disable the top leaderboard if you don't want it.
-  # Please note that it will require a full server restart to take into effect.
-  enabled: true
+  enabled: true # If the top leaderboard is built; toggling needs a full server restart
+  cache-lifetime: 60 # Lifetime of the leaderboard cache, in seconds
 
-  # Time in seconds for the lifetime of the leaderboard cache.
-  cache-lifetime: 60
-
-# Shortcut names for short currency format, ordered by magnitude.
-shortcuts: ["", "k", "M", "B", "T", "P", "E"]
+shortcuts: ["", "k", "M", "B", "T", "P", "E"] # Suffixes for the short format, ordered by magnitude
 
 currencies:
-  - id: crystals # The ID of the currency.
-    name: "Crystals" # The name of the currency.
-    symbol: "❖"
-    default: 0 # The default balance.
-    max: -1 # The maximum balance, set to -1 if no max.
-    payable: false # If players should be able to use /ecobits pay to pay other players
-    decimal: true # If decimal amounts are allowed in commands, rather than just integer amounts.
-    max-decimals: 2 # How many decimals should we allow the players to type in commands.
-    vault: false # If this currency should be registered with vault. (Only one currency can be registered with vault, requires server restart)
-    local: false # If this currency should not sync between servers.
-    balance-shorthand: false # If this currency main command (/crystals) should act as balance command
-    format: "&b%symbol%&a%amount% &b%currency%" # The formatted balance. (Placeholders: %currency%, %amount%, %symbol%)
-    format-short: "&b%symbol% %amount%" # The formatted shortened balance. (Placeholders: %currency%, %amount%, %symbol%)
-    # A tutorial/examples can be found at: https://docs.oracle.com/javase/tutorial/i18n/format/decimalFormat.html
-    decimal-format: "#,##0.00" # The decimal format
-    decimal-format-short: "#,##0.00" # The decimal shortened format
-    commands: # A list of commands dedicated to this currency (for easier paying, checking balance, etc.)
+  - id: crystals # The currency ID; used by the Price system and %ecobits_<id>% placeholders
+    name: "Crystals" # The display name shown in messages and the %currency% placeholder
+    symbol: "❖" # The symbol exposed as %symbol% in the format strings
+    default: 0 # The balance every player starts with
+    max: -1 # The maximum balance a player can hold; set to -1 for no limit
+    payable: false # If players can send this currency with /<currency> pay
+    decimal: true # If decimal amounts are allowed in commands, not just whole numbers
+    max-decimals: 2 # How many decimal places players may type in commands
+    vault: false # If this currency registers with Vault; only one can, and it needs a restart
+    local: false # If true, the balance does not sync between servers
+    balance-shorthand: false # If /<currency> with no arguments shows the balance instead of the help menu
+    format: "&b%symbol%&a%amount% &b%currency%" # Full balance format; placeholders %currency%, %amount%, %symbol%
+    format-short: "&b%symbol% %amount%" # Shortened balance format; same placeholders
+    decimal-format: "#,##0.00" # Java DecimalFormat pattern for the full amount
+    decimal-format-short: "#,##0.00" # Java DecimalFormat pattern for the shortened amount
+    commands: # Dedicated commands for this currency (balance, pay, give, and so on)
       - crystals
       - ecocrystals
-
 ```
+
+<hr/>
+
+## Where to go next
+
+- **Add a currency:** the step-by-step [How to Make a Currency](how-to-make-a-currency) walkthrough.
+- **Display balances:** every placeholder on the [PlaceholderAPI](placeholderapi) page.
+- **Spend it elsewhere:** the [Price](https://plugins.auxilor.io/all-plugins/prices) system for using currencies in other eco plugins.

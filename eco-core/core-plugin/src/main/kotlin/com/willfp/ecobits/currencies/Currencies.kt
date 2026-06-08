@@ -3,6 +3,7 @@ package com.willfp.ecobits.currencies
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableList
+import com.willfp.eco.core.price.Prices
 import com.willfp.ecobits.plugin
 
 object Currencies {
@@ -61,6 +62,7 @@ object Currencies {
      */
     @JvmStatic
     fun removeCurrency(currency: Currency) {
+        Prices.unregisterPriceFactory(currency.priceFactory)
         BY_ID.remove(currency.id)
     }
 }

@@ -79,6 +79,8 @@ open class Currency(
 
     val decimalFormatShort = DecimalFormat(config.getString("decimal-format-short"))
 
+    val priceFactory = PriceFactoryCurrency(this)
+
     private fun registerCommands() {
         this.commands.forEach { it.register() }
     }
@@ -191,7 +193,7 @@ open class Currency(
             }
         )
 
-        Prices.registerPriceFactory(PriceFactoryCurrency(this))
+        Prices.registerPriceFactory(priceFactory)
 
         if (isRegisteredWithVault && IntegrationVault.isVaultPresent) {
             Bukkit.getServer().servicesManager.register(

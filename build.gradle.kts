@@ -10,10 +10,7 @@ plugins {
 
 group = "com.willfp"
 version = findProperty("version")!!
-// useGradleVersions=true (set by release workflows) pins dependencies to the
-// versions in gradle.properties; otherwise dev builds track the latest master snapshot.
-val useGradleVersions = findProperty("useGradleVersions") == "true"
-val ecoVersion = if (useGradleVersions) findProperty("eco-version") else "dev-SNAPSHOT"
+val ecoVersion = findProperty("eco-version")
 
 base {
     archivesName.set(project.name)
@@ -33,23 +30,13 @@ allprojects {
 
     repositories {
         mavenCentral()
-        mavenLocal {
-            content {
-                excludeGroup("com.willfp")
-                excludeGroup("com.auxilor")
-                excludeGroup("com.exanthiax")
-            }
-        }
+        mavenLocal()
 
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.auxilor.io/repository/maven-public/")
         maven("https://jitpack.io")
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://repo.helpch.at/releases")
-    }
-
-    configurations.all {
-        resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }
 
     dependencies {

@@ -42,7 +42,7 @@ publishing {
 
 afterEvaluate {
     publishing.publications.named<MavenPublication>("shadow") {
-        artifact(tasks.named("libreforgeJar"))
+        artifact(tasks.named("shadowJar"))
     }
 }
 

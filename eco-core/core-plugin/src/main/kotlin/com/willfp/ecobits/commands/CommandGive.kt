@@ -36,7 +36,7 @@ class CommandGive(
         @Suppress("DEPRECATION")
         val player = Bukkit.getOfflinePlayer(args[0])
 
-        if (!player.hasPlayedBefore()) {
+        if (!player.hasPlayedBefore() && !player.isOnline) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-player"))
             return
         }

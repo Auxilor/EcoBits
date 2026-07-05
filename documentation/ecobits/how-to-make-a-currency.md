@@ -16,7 +16,7 @@ A **currency** is one entry in the `currencies` list inside EcoBits' `config.yml
 
 ## Naming and IDs
 
-The `id` field is the currency's identity. It is the name you pass to the [Price](https://plugins.auxilor.io/all-plugins/prices) system in other plugins and the `<id>` in every `%ecobits_<id>%` placeholder, so keep it stable once players have balances.
+The `id` field is the currency's identity. It is the name you pass to the [Price](https://hub.auxilor.io/wiki/eco/the-price-lookup-system) system in other plugins and the `<id>` in every `%ecobits_<id>%` placeholder, so keep it stable once players have balances.
 
 :::warning ID rules
 IDs may only contain lowercase letters, numbers, and underscores (a-z, 0-9, _). No spaces, capitals, or hyphens, or the currency will not load.
@@ -148,7 +148,7 @@ These placeholders are available inside the `format` and `format-short` strings:
 
 ## Where to go next
 
-- **Spend it elsewhere:** use the currency `id` in the [Price](https://plugins.auxilor.io/all-plugins/prices) system across your other eco plugins.
+- **Spend it elsewhere:** use the currency `id` in the [Price](https://hub.auxilor.io/wiki/eco/the-price-lookup-system) system across your other eco plugins.
 - **Commands and permissions:** the full list on the [Commands and Permissions](commands-and-permissions) page.
 - **Display balances:** every placeholder on the [PlaceholderAPI](placeholderapi) page.
 - **Global settings:** leaderboards and shortcuts in the [Plugin Config](plugin-config) reference.

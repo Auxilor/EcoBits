@@ -5,7 +5,7 @@
 
 # Want to use these currencies in other plugins?
 # Use the price system and the name of the currency as the ID,
-# read more here: https://plugins.auxilor.io/all-plugins/prices
+# read more here: https://hub.auxilor.io/wiki/eco/the-price-lookup-system
 
 # Placeholders:
 # %ecobits_<id>% - The balance of a certain currency

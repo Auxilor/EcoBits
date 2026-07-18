@@ -3,6 +3,8 @@ package com.willfp.ecobits.currencies
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableList
+import com.willfp.eco.core.Eco
+import com.willfp.eco.core.price.Prices
 import com.willfp.ecobits.plugin
 
 object Currencies {
@@ -34,12 +36,17 @@ object Currencies {
      */
     @JvmStatic
     fun update() {
-        for (currency in values()) {
-            removeCurrency(currency)
-        }
+        Eco.get().beginCommandBatch()
+        try {
+            for (currency in values()) {
+                removeCurrency(currency)
+            }
 
-        for (config in plugin.configYml.getSubsections("currencies")) {
-            addNewCurrency(Currency(config.getString("id"), plugin, config))
+            for (config in plugin.configYml.getSubsections("currencies")) {
+                addNewCurrency(Currency(config.getString("id"), plugin, config))
+            }
+        } finally {
+            Eco.get().endCommandBatch()
         }
     }
 
@@ -61,6 +68,7 @@ object Currencies {
      */
     @JvmStatic
     fun removeCurrency(currency: Currency) {
+        Prices.unregisterPriceFactory(currency.priceFactory)
         BY_ID.remove(currency.id)
     }
 }

@@ -4,7 +4,7 @@ title: "EcoBits"
 
 ## What is EcoBits?
 
-EcoBits is a custom currency plugin that runs as many currencies as you want alongside your server's main economy. Each currency gets its own **dynamic commands**, its own **formatting**, and an optional **leaderboard**, and you can spend it anywhere the eco [Price](https://hub.auxilor.io/wiki/eco/the-price-lookup-system) system is used, including EcoShop, EcoSkills, and any other eco plugin.
+EcoBits is a custom currency plugin that runs as many currencies as you want alongside your server's main economy. Each currency gets its own **dynamic commands**, its own **formatting**, and an optional **leaderboard**, and you can spend it anywhere the eco [Price](https://plugins.auxilor.io/all-plugins/prices) system is used, including EcoShop, EcoSkills, and any other eco plugin.
 
 ## What sets EcoBits apart?
 

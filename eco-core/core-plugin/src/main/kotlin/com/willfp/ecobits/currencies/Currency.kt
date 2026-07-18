@@ -2,7 +2,7 @@
 
 package com.willfp.ecobits.currencies
 
-import com.github.benmanes.caffeine.cache.Caffeine
+import com.willfp.eco.core.cache.EcoCache
 import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
@@ -21,10 +21,10 @@ import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
+import java.time.Duration
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
-import java.util.concurrent.TimeUnit
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -35,9 +35,9 @@ open class Currency(
     val config: Config
 ) {
 
-    private val descCache = Caffeine.newBuilder()
-        .expireAfterWrite(plugin.configYml.getInt("gui.cache-ttl").toLong(), TimeUnit.MILLISECONDS)
-        .build<Int, String>()
+    private val descCache = EcoCache.builder<Int, String>()
+        .expireAfterWrite(Duration.ofMillis(plugin.configYml.getInt("gui.cache-ttl").toLong()))
+        .build()
 
     val default = BigDecimal(config.getDouble("default"))
 

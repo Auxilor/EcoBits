@@ -14,7 +14,7 @@ Toggling `leaderboard.enabled` and changing a currency's `vault` setting both ne
 ```yaml
 # Want to use these currencies in other plugins?
 # Use the price system and the name of the currency as the ID,
-# read more here: https://hub.auxilor.io/wiki/eco/the-price-lookup-system
+# read more here: https://plugins.auxilor.io/all-plugins/prices
 
 # Placeholders:
 # %ecobits_<id>% - The balance of a certain currency
@@ -75,4 +75,4 @@ currencies:
 
 - **Add a currency:** the step-by-step [How to Make a Currency](how-to-make-a-currency) walkthrough.
 - **Display balances:** every placeholder on the [PlaceholderAPI](placeholderapi) page.
-- **Spend it elsewhere:** the [Price](https://hub.auxilor.io/wiki/eco/the-price-lookup-system) system for using currencies in other eco plugins.
+- **Spend it elsewhere:** the [Price](https://plugins.auxilor.io/all-plugins/prices) system for using currencies in other eco plugins.

@@ -54,6 +54,8 @@ currencies:
     decimal: true # If decimal amounts are allowed in commands, rather than just integer amounts.
     max-decimals: 2 # How many decimals should we allow the players to type in commands.
     vault: false # If this currency should be registered with vault. (Only one currency can be registered with vault, requires server restart)
+    vault-messages: false # If a message should be sent to the player when their balance is changed through Vault (e.g. shop plugins, DailyRewards). Off by default as some plugins call Vault very often. Overrides balance-messages for Vault-triggered changes.
+    balance-messages: false # If a "you spent/gained X" message should be sent to the player whenever their balance changes programmatically (e.g. EcoShop or another plugin using the price system). Does not affect Vault, /ecobits commands, or /pay, which have their own messages.
     local: false # If this currency should not sync between servers.
     balance-shorthand: false # If this currency main command (/crystals) should act as balance command
     format: "&b%symbol%&a%amount% &b%currency%" # The formatted balance. (Placeholders: %currency%, %amount%, %symbol%)

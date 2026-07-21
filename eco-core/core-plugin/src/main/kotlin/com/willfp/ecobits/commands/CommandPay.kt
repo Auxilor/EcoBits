@@ -92,8 +92,8 @@ class CommandPay(
             }
         }
 
-        recipient.adjustBalance(currency, amount)
-        player.adjustBalance(currency, -amount)
+        recipient.adjustBalance(currency, amount, notify = false)
+        player.adjustBalance(currency, -amount, notify = false)
 
         // Send a message to recipient if connected
         if (recipient.isOnline) {

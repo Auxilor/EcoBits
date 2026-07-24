@@ -51,7 +51,7 @@ class CommandTakesilent(
 
         if (currency.maxDecimals != null && amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) return
 
-        player.adjustBalance(currency, -amount)
+        player.adjustBalance(currency, -amount, notify = false)
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {

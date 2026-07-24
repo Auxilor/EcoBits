@@ -21,6 +21,8 @@ messages:
   paid-player: "&fYou paid %player%&r &a%amount_formatted%&f!"
   too-much: "&fYou can't pay %player%&r this many &f%currency%&f as they already have too many!"
   received-money: "&fYou received &a%amount_formatted% &ffrom %player%."
+  spent-currency: "&fThe server has taken &a%amount_formatted%&f."
+  gained-currency: "&fYou received &a%amount_formatted%&f."
 
 # %balance%, %balance_short%, %balance_formatted%, %balance_formatted_short%, %balance_commas%, %balance_integer%
 top-line-format: "%rank%. %player% - %balance_formatted%"

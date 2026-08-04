@@ -1,17 +1,14 @@
 package com.willfp.ecobits.commands
 
 import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.util.StringUtils
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
-import com.willfp.ecobits.currencies.withCurrencyPlaceholders
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
 
 class CommandGivesilent(
@@ -55,13 +52,6 @@ class CommandGivesilent(
         if (currency.maxDecimals != null && amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) return
 
         player.adjustBalance(currency, amount)
-
-        if (player.isOnline) {
-            (player.player as Player).sendMessage(
-                plugin.langYml.getMessage("received-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                    .withCurrencyPlaceholders(amount, currency)
-            )
-        }
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {

@@ -11,7 +11,6 @@ import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
-import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
@@ -21,7 +20,6 @@ import com.willfp.ecobits.plugin
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
 import java.time.Duration
 import java.math.BigDecimal
@@ -60,10 +58,6 @@ open class Currency(
     else null
 
     val isRegisteredWithVault = config.getBool("vault")
-
-    val sendsVaultMessages = config.getBool("vault-messages")
-
-    val sendsBalanceMessages = config.getBool("balance-messages")
 
     val isLocal = config.getBool("local")
 
@@ -297,31 +291,24 @@ fun OfflinePlayer.setBalance(currency: Currency, value: BigDecimal) {
     )
 }
 
-fun OfflinePlayer.adjustBalance(
-    currency: Currency,
-    by: BigDecimal,
-    notify: Boolean = currency.sendsBalanceMessages
-) {
+fun OfflinePlayer.adjustBalance(currency: Currency, by: BigDecimal) {
     this.setBalance(currency, this.getBalance(currency) + by)
-
-    if (notify && this.isOnline) {
-        this.sendBalanceMessage(currency, by)
-    }
 }
 
-private fun OfflinePlayer.sendBalanceMessage(currency: Currency, by: BigDecimal) {
-    val amount = by.abs()
-    val key = if (by.signum() < 0) "spent-currency" else "gained-currency"
+fun String.withCurrencyPlaceholders(amount: BigDecimal, currency: Currency, player: String? = null): String {
+    var message = this
+        .replace("%amount%", amount.decimalFormat(currency))
+        .replace("%amount_short%", amount.decimalFormatShort(currency))
+        .replace("%amount_formatted%", amount.format(currency))
+        .replace("%amount_formatted_short%", amount.formatShort(currency))
+        .replace("%amount_raw%", amount.toPlainString())
+        .replace("%amount_integer%", amount.toInt().toString())
+        .replace("%currency%", currency.name)
+        .replace("%symbol%", currency.symbol)
 
-    (this.player as Player).sendMessage(
-        plugin.langYml.getMessage(key, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-            .replace("%amount%", amount.decimalFormat(currency))
-            .replace("%amount_short%", amount.decimalFormatShort(currency))
-            .replace("%amount_formatted%", amount.format(currency))
-            .replace("%amount_formatted_short%", amount.formatShort(currency))
-            .replace("%amount_raw%", amount.toPlainString())
-            .replace("%amount_integer%", amount.toInt().toString())
-            .replace("%currency%", currency.name)
-            .replace("%symbol%", currency.symbol)
-    )
+    if (player != null) {
+        message = message.replace("%player%", player)
+    }
+
+    return message
 }

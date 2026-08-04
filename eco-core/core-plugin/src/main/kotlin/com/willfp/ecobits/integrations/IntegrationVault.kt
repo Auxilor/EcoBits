@@ -129,7 +129,7 @@ class IntegrationVault(
             )
         }
 
-        player.adjustBalance(currency, -amount.toBigDecimal(), notify = currency.sendsVaultMessages)
+        player.adjustBalance(currency, -amount.toBigDecimal())
 
         return EconomyResponse(
             amount,
@@ -176,8 +176,7 @@ class IntegrationVault(
             }
         }
 
-        player.adjustBalance(currency, amount.toBigDecimal(), notify = currency.sendsVaultMessages)
-
+        player.adjustBalance(currency, amount.toBigDecimal())
         return EconomyResponse(
             amount,
             player.getBalance(currency).toDouble(),

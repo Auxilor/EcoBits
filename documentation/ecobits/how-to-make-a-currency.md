@@ -42,6 +42,7 @@ currencies:
   - id: crystals # The currency ID; used by the Price system and in %ecobits_<id>% placeholders
     name: "Crystals" # The display name shown in messages and the %currency% placeholder
     symbol: "❖" # The symbol exposed as %symbol% in the format strings
+    prefix: "" # The prefix shown before messages about this currency; blank uses the plugin's default prefix
 
     # === Balance limits: starting and maximum balances ===
     default: 0 # The balance every player starts with
@@ -75,6 +76,7 @@ The lead fields name the currency and decide how other plugins reach it.
 - id: crystals # Referenced by the Price system and %ecobits_<id>% placeholders
   name: "Crystals" # Display name; fills the %currency% placeholder
   symbol: "❖" # Fills the %symbol% placeholder in format strings
+  prefix: "" # Prefix for this currency's messages; falls back to lang.yml's messages.prefix when blank
 ```
 
 ### Balance limits

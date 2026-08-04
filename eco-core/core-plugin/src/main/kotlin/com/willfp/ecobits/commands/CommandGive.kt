@@ -6,6 +6,7 @@ import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
@@ -78,13 +79,13 @@ class CommandGive(
         player.adjustBalance(currency, amount)
 
         sender.sendMessage(
-            plugin.langYml.getMessage("gave-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            plugin.langYml.getCurrencyMessage("gave-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .withCurrencyPlaceholders(amount, currency, player.savedDisplayName)
         )
 
         if (player.isOnline) {
             (player.player as Player).sendMessage(
-                plugin.langYml.getMessage("received-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                plugin.langYml.getCurrencyMessage("received-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                     .withCurrencyPlaceholders(amount, currency)
             )
         }

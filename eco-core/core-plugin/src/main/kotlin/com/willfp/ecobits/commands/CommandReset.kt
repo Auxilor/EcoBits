@@ -5,6 +5,7 @@ import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.setBalance
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
 import com.willfp.ecobits.plugin
@@ -60,7 +61,7 @@ class CommandReset(
 
         player.name?.let {
             sender.sendMessage(
-                plugin.langYml.getMessage("reset-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                plugin.langYml.getCurrencyMessage("reset-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                     .withCurrencyPlaceholders(currency.default, currency, player.savedDisplayName)
             )
         }
@@ -74,7 +75,7 @@ class CommandReset(
         }
 
         sender.sendMessage(
-            plugin.langYml.getMessage("reset-all-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            plugin.langYml.getCurrencyMessage("reset-all-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .withCurrencyPlaceholders(currency.default, currency)
         )
     }

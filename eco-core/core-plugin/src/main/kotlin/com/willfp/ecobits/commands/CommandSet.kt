@@ -5,6 +5,7 @@ import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
 import com.willfp.ecobits.currencies.setBalance
@@ -77,7 +78,7 @@ class CommandSet(
         player.setBalance(currency, amount)
 
         sender.sendMessage(
-            plugin.langYml.getMessage("set-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            plugin.langYml.getCurrencyMessage("set-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .withCurrencyPlaceholders(amount, currency, player.savedDisplayName)
         )
     }

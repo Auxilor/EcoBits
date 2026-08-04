@@ -7,6 +7,7 @@ import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
 import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
@@ -78,13 +79,13 @@ class CommandPay(
         }
 
         if (player.getBalance(currency) < amount) {
-            player.sendMessage(plugin.langYml.getMessage("cannot-afford"))
+            player.sendMessage(plugin.langYml.getCurrencyMessage("cannot-afford", currency))
             return
         }
 
         if (currency.max != null) {
             if (recipient.getBalance(currency) + amount > currency.max) {
-                player.sendMessage(plugin.langYml.getMessage("too-much"))
+                player.sendMessage(plugin.langYml.getCurrencyMessage("too-much", currency))
                 return
             }
         }
@@ -95,13 +96,13 @@ class CommandPay(
         // Send a message to recipient if connected
         if (recipient.isOnline) {
             (recipient.player as Player).sendMessage(
-                plugin.langYml.getMessage("received-money", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                plugin.langYml.getCurrencyMessage("received-money", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                     .withCurrencyPlaceholders(amount, currency, player.savedDisplayName)
             )
         }
 
         player.sendMessage(
-            plugin.langYml.getMessage("paid-player", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            plugin.langYml.getCurrencyMessage("paid-player", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .withCurrencyPlaceholders(amount, currency, recipient.savedDisplayName)
         )
     }

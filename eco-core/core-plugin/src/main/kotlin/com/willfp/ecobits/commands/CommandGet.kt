@@ -6,6 +6,7 @@ import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
@@ -49,7 +50,7 @@ class CommandGet(
         }
 
         sender.sendMessage(
-            plugin.langYml.getMessage("other-balance", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            plugin.langYml.getCurrencyMessage("other-balance", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .withCurrencyPlaceholders(player.getBalance(currency), currency, player.savedDisplayName)
         )
     }

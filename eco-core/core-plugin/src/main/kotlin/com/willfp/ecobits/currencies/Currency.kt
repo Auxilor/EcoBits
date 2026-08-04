@@ -3,6 +3,7 @@
 package com.willfp.ecobits.currencies
 
 import com.willfp.eco.core.cache.EcoCache
+import com.willfp.eco.core.config.base.LangYml
 import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
@@ -11,6 +12,7 @@ import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
 import com.willfp.eco.core.price.Prices
+import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
@@ -44,6 +46,8 @@ open class Currency(
     val name = config.getFormattedString("name")
 
     val symbol = config.getFormattedString("symbol")
+
+    val prefix: String? = if (config.has("prefix")) config.getFormattedString("prefix").ifBlank { null } else null
 
     val max: BigDecimal? = if (config.has("max") && config.getDouble("max") > 0)
         BigDecimal(config.getDouble("max"))
@@ -311,4 +315,15 @@ fun String.withCurrencyPlaceholders(amount: BigDecimal, currency: Currency, play
     }
 
     return message
+}
+
+val Currency.messagePrefix: String
+    get() = this.prefix ?: this.plugin.langYml.prefix
+
+fun LangYml.getCurrencyMessage(
+    key: String,
+    currency: Currency,
+    option: StringUtils.FormatOption = StringUtils.FormatOption.WITH_PLACEHOLDERS
+): String {
+    return currency.messagePrefix + this.getFormattedString("${LangYml.KEY_MESSAGES}.$key", option)
 }

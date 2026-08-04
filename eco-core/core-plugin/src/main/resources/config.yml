@@ -48,6 +48,7 @@ currencies:
   - id: crystals # The ID of the currency.
     name: "Crystals" # The name of the currency.
     symbol: "❖"
+    prefix: "" # The prefix shown before messages about this currency, e.g. "&b[Crystals]&r ". Leave blank to use the plugin's default prefix instead.
     default: 0 # The default balance.
     max: -1 # The maximum balance, set to -1 if no max.
     payable: false # If players should be able to use /ecobits pay to pay other players

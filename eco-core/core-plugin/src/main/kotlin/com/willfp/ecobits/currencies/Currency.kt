@@ -317,13 +317,11 @@ fun String.withCurrencyPlaceholders(amount: BigDecimal, currency: Currency, play
     return message
 }
 
-val Currency.messagePrefix: String
-    get() = this.prefix ?: this.plugin.langYml.prefix
-
 fun LangYml.getCurrencyMessage(
     key: String,
     currency: Currency,
     option: StringUtils.FormatOption = StringUtils.FormatOption.WITH_PLACEHOLDERS
 ): String {
-    return currency.messagePrefix + this.getFormattedString("${LangYml.KEY_MESSAGES}.$key", option)
+    val prefix = currency.prefix ?: currency.plugin.langYml.prefix
+    return prefix + this.getFormattedString("${LangYml.KEY_MESSAGES}.$key", option)
 }

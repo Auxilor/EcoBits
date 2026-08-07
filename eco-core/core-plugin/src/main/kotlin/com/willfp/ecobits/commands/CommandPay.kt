@@ -6,13 +6,11 @@ import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
-import com.willfp.ecobits.currencies.decimalFormat
-import com.willfp.ecobits.currencies.decimalFormatShort
-import com.willfp.ecobits.currencies.format
-import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
+import com.willfp.ecobits.currencies.withCurrencyPlaceholders
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -81,47 +79,31 @@ class CommandPay(
         }
 
         if (player.getBalance(currency) < amount) {
-            player.sendMessage(plugin.langYml.getMessage("cannot-afford"))
+            player.sendMessage(plugin.langYml.getCurrencyMessage("cannot-afford", currency))
             return
         }
 
         if (currency.max != null) {
             if (recipient.getBalance(currency) + amount > currency.max) {
-                player.sendMessage(plugin.langYml.getMessage("too-much"))
+                player.sendMessage(plugin.langYml.getCurrencyMessage("too-much", currency))
                 return
             }
         }
 
-        recipient.adjustBalance(currency, amount, notify = false)
-        player.adjustBalance(currency, -amount, notify = false)
+        recipient.adjustBalance(currency, amount)
+        player.adjustBalance(currency, -amount)
 
         // Send a message to recipient if connected
         if (recipient.isOnline) {
             (recipient.player as Player).sendMessage(
-                plugin.langYml.getMessage("received-money", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                    .replace("%player%", player.savedDisplayName)
-                    .replace("%amount%", amount.decimalFormat(currency))
-                    .replace("%amount_short%", amount.decimalFormatShort(currency))
-                    .replace("%amount_formatted%", amount.format(currency))
-                    .replace("%amount_formatted_short%", amount.formatShort(currency))
-                    .replace("%amount_raw%", amount.toPlainString())
-                    .replace("%amount_integer%", amount.toInt().toString())
-                    .replace("%currency%", currency.name)
-                    .replace("%symbol%", currency.symbol)
+                plugin.langYml.getCurrencyMessage("received-money", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                    .withCurrencyPlaceholders(amount, currency, player.savedDisplayName)
             )
         }
 
         player.sendMessage(
-            plugin.langYml.getMessage("paid-player", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .replace("%player%", recipient.savedDisplayName)
-                .replace("%amount%", amount.decimalFormat(currency))
-                .replace("%amount_short%", amount.decimalFormatShort(currency))
-                .replace("%amount_formatted%", amount.format(currency))
-                .replace("%amount_formatted_short%", amount.formatShort(currency))
-                .replace("%amount_raw%", amount.toPlainString())
-                .replace("%amount_integer%", amount.toInt().toString())
-                .replace("%currency%", currency.name)
-                .replace("%symbol%", currency.symbol)
+            plugin.langYml.getCurrencyMessage("paid-player", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                .withCurrencyPlaceholders(amount, currency, recipient.savedDisplayName)
         )
     }
 

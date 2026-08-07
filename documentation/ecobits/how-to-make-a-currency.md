@@ -42,6 +42,7 @@ currencies:
   - id: crystals # The currency ID; used by the Price system and in %ecobits_<id>% placeholders
     name: "Crystals" # The display name shown in messages and the %currency% placeholder
     symbol: "❖" # The symbol exposed as %symbol% in the format strings
+    prefix: "" # The prefix shown before messages about this currency; blank uses the plugin's default prefix
 
     # === Balance limits: starting and maximum balances ===
     default: 0 # The balance every player starts with
@@ -52,8 +53,6 @@ currencies:
     decimal: true # If decimal amounts are allowed in commands, not just whole numbers
     max-decimals: 2 # How many decimal places players may type in commands
     vault: false # If this currency registers with Vault; only one currency can, and it needs a restart
-    vault-messages: false # If a "you spent/gained X" message is sent when the balance changes through Vault (e.g. shop plugins); off by default as some plugins call Vault very often. Overrides balance-messages for Vault-triggered changes.
-    balance-messages: false # If a "you spent/gained X" message is sent whenever the balance changes programmatically (e.g. a plugin using the Price system); does not affect Vault, /ecobits commands, or /pay, which have their own messages.
     local: false # If true, the balance does not sync between servers
     balance-shorthand: false # If /<currency> with no arguments shows the balance instead of the help menu
 
@@ -77,6 +76,7 @@ The lead fields name the currency and decide how other plugins reach it.
 - id: crystals # Referenced by the Price system and %ecobits_<id>% placeholders
   name: "Crystals" # Display name; fills the %currency% placeholder
   symbol: "❖" # Fills the %symbol% placeholder in format strings
+  prefix: "" # Prefix for this currency's messages; falls back to lang.yml's messages.prefix when blank
 ```
 
 ### Balance limits
@@ -97,15 +97,9 @@ payable: false # Enables /<currency> pay between players
 decimal: true # Allows fractional amounts in commands
 max-decimals: 2 # Caps how many decimal places players may type
 vault: false # Registers this currency with Vault (one currency only)
-vault-messages: false # Sends a "you spent/gained X" message when the balance changes through Vault; overrides balance-messages for Vault-triggered changes
-balance-messages: false # Sends a "you spent/gained X" message when the balance changes programmatically (e.g. via the Price system)
 local: false # Stops the balance syncing between servers when true
 balance-shorthand: false # Makes bare /<currency> print the balance
 ```
-
-:::info
-Both `vault-messages` and `balance-messages` are off by default because some plugins (shops, daily-reward plugins) adjust balances very often. Neither affects the dedicated messages already sent by `/ecobits`, `/<currency> pay`, or Vault-registered plugins that send their own feedback.
-:::
 
 :::warning
 Setting `vault: true` on a currency needs a full server restart, not just `/ecobits reload`, and only one currency can hold the Vault registration at a time.

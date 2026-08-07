@@ -6,15 +6,14 @@ import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
-import com.willfp.ecobits.currencies.decimalFormat
-import com.willfp.ecobits.currencies.decimalFormatShort
-import com.willfp.ecobits.currencies.format
-import com.willfp.ecobits.currencies.formatShort
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
+import com.willfp.ecobits.currencies.withCurrencyPlaceholders
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
 
 class CommandTake(
@@ -77,20 +76,19 @@ class CommandTake(
             return
         }
 
-        player.adjustBalance(currency, -amount, notify = false)
+        player.adjustBalance(currency, -amount)
 
         sender.sendMessage(
-            plugin.langYml.getMessage("took-currency", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .replace("%player%", player.savedDisplayName)
-                .replace("%amount%", amount.decimalFormat(currency))
-                .replace("%amount_short%", amount.decimalFormatShort(currency))
-                .replace("%amount_formatted%", amount.format(currency))
-                .replace("%amount_formatted_short%", amount.formatShort(currency))
-                .replace("%amount_raw%", amount.toPlainString())
-                .replace("%amount_integer%", amount.toInt().toString())
-                .replace("%currency%", currency.name)
-                .replace("%symbol%", currency.symbol)
+            plugin.langYml.getCurrencyMessage("took-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                .withCurrencyPlaceholders(amount, currency, player.savedDisplayName)
         )
+
+        if (player.isOnline) {
+            (player.player as Player).sendMessage(
+                plugin.langYml.getCurrencyMessage("lost-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                    .withCurrencyPlaceholders(amount, currency)
+            )
+        }
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {

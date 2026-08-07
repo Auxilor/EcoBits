@@ -10,6 +10,7 @@ import com.willfp.ecobits.currencies.decimalFormatShort
 import com.willfp.ecobits.currencies.format
 import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -39,7 +40,7 @@ class CommandBalance(
         }
 
         player.sendMessage(
-            plugin.langYml.getMessage("balance", StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            plugin.langYml.getCurrencyMessage("balance", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%player%", player.savedDisplayName)
                 .replace("%amount%", player.getBalance(currency).decimalFormat(currency))
                 .replace("%amount_short%", player.getBalance(currency).decimalFormatShort(currency))

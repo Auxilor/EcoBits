@@ -17,6 +17,7 @@ import com.willfp.eco.util.formatWithCommas
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
 import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getPosition
+import com.willfp.ecobits.events.CurrencyGainEvent
 import com.willfp.ecobits.integrations.IntegrationVault
 import com.willfp.ecobits.plugin
 import net.milkbowl.vault.economy.Economy
@@ -289,10 +290,18 @@ fun OfflinePlayer.setBalance(currency: Currency, value: BigDecimal) {
     val coerced = if (currency.max == null) value.coerceAtLeast(BigDecimal.ZERO)
     else value.coerceIn(BigDecimal.ZERO..currency.max)
 
+    val previousBalance = this.getBalance(currency)
+
     this.profile.write(
         currency.key,
         coerced
     )
+
+    if (coerced > previousBalance) {
+        Bukkit.getPluginManager().callEvent(
+            CurrencyGainEvent(this, currency, coerced - previousBalance, coerced)
+        )
+    }
 }
 
 fun OfflinePlayer.adjustBalance(currency: Currency, by: BigDecimal) {

@@ -8,6 +8,8 @@ import com.willfp.ecobits.commands.CommandEcoBits
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.EcoBitsTopPlaceholder
 import com.willfp.ecobits.integrations.IntegrationVault
+import com.willfp.ecobits.integrations.VaultBalancePoller
+import org.bukkit.event.Listener
 
 internal lateinit var plugin: EcoBitsPlugin
     private set
@@ -32,6 +34,8 @@ class EcoBitsPlugin : EcoPlugin() {
     override fun handleEnable() {
         if (this.configYml.getBool("leaderboard.enabled"))
             EcoBitsTopPlaceholder.register()
+
+        VaultBalancePoller.start()
     }
 
     override fun handleReload() {
@@ -42,6 +46,10 @@ class EcoBitsPlugin : EcoPlugin() {
         return listOf(
             CommandEcoBits
         )
+    }
+
+    override fun loadListeners(): List<Listener> {
+        return listOf(VaultBalancePoller)
     }
 
     override fun getCustomCharts() = listOf(

@@ -41,6 +41,13 @@ leaderboard:
   # Time in seconds for the lifetime of the leaderboard cache.
   cache-lifetime: 60
 
+vault:
+  # Poll external Vault economies (only used when a different plugin, not
+  # EcoBits, is the registered Vault provider) for balance gains, so
+  # gain_currency-style triggers can react to money given by other plugins.
+  # Set to -1 to disable.
+  poll-interval-seconds: 5
+
 # Shortcut names for short currency format, ordered by magnitude.
 shortcuts: ["", "k", "M", "B", "T", "P", "E"]
 

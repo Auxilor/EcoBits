@@ -10,6 +10,7 @@ plugins {
 
 group = "com.willfp"
 version = findProperty("version")!!
+val ecoApiVersion = findProperty("eco-api-version")
 val ecoVersion = findProperty("eco-version")
 
 base {
@@ -140,6 +141,7 @@ allprojects {
             filesMatching(listOf("**plugin.yml")) {
                 expand(
                     "version" to project.version,
+                    "ecoApiVersion" to ecoApiVersion!!,
                     "pluginName" to rootProject.name
                 )
             }

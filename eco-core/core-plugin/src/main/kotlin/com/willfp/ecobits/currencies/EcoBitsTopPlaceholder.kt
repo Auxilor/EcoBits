@@ -5,7 +5,6 @@ import com.willfp.eco.core.placeholder.RegistrablePlaceholder
 import com.willfp.eco.core.placeholder.context.PlaceholderContext
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.eco.util.savedDisplayName
-import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getTop
 import java.util.regex.Pattern
 
 object EcoBitsTopPlaceholder : RegistrablePlaceholder {
@@ -27,12 +26,15 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
         val formatType = matcher.group(4)
 
         val currency = Currencies.getByID(currencyId) ?: return null
-        val topEntry = currency.getTop(place) ?: return emptyPosition
+        val topEntry = currency.leaderboard.getTop(place) ?: return emptyPosition
+        val player = topEntry.player
 
         return when (type) {
-            "name" -> topEntry.player.savedDisplayName
+            "name" -> player.savedDisplayName
             "amount" -> {
-                val amount = topEntry.amount
+                // Read the exact BigDecimal rather than the entry's double: the leaderboard ranks
+                // on a double, which does not round-trip a balance above 2^53.
+                val amount = player.getBalance(currency)
                 when (formatType) {
                     "short" -> amount.decimalFormatShort(currency)
                     "formatted" -> amount.format(currency)

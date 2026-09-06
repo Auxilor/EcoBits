@@ -38,8 +38,8 @@ leaderboard:
   # Please note that it will require a full server restart to take into effect.
   enabled: true
 
-  # Time in seconds for the lifetime of the leaderboard cache.
-  cache-lifetime: 60
+  # Leaderboards are refreshed on a schedule by eco, shared across every plugin.
+  # Configure the refresh interval and retained entries in eco's config.yml, under `leaderboards:`.
 
 # Shortcut names for short currency format, ordered by magnitude.
 shortcuts: ["", "k", "M", "B", "T", "P", "E"]

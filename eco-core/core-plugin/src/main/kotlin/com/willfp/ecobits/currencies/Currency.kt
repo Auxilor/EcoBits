@@ -8,6 +8,10 @@ import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
+import com.willfp.eco.core.Eco
+import com.willfp.eco.core.leaderboard.Leaderboard
+import com.willfp.eco.core.leaderboard.Leaderboards
+import com.willfp.eco.core.leaderboard.registerStandardPlaceholders
 import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
@@ -16,7 +20,6 @@ import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.ecobits.EcoBitsPlugin
 import com.willfp.ecobits.commands.DynamicCurrencyCommand
-import com.willfp.ecobits.currencies.CurrenciesLeaderboard.getPosition
 import com.willfp.ecobits.events.CurrencyGainEvent
 import com.willfp.ecobits.integrations.IntegrationVault
 import com.willfp.ecobits.plugin
@@ -85,6 +88,20 @@ open class Currency(
     val decimalFormatShort = DecimalFormat(config.getString("decimal-format-short"))
 
     val priceFactory = PriceFactoryCurrency(this)
+
+    val leaderboard: Leaderboard = Leaderboards.register(plugin, id) { uuids ->
+        // The leaderboard.enabled toggle is honoured here rather than by skipping registration:
+        // an empty map ranks nobody, which is what the old cache loader did when disabled.
+        if (!plugin.configYml.getBool("leaderboard.enabled")) emptyMap() else {
+            // No zero-filter, and absent uuids are defaulted in rather than dropped: the previous
+            // implementation sorted every offline player, including those reading the key's
+            // default. Filtering would shrink trackedPlayers and drop trailing %top_N% positions.
+            // Ranked on double for ordering only - re-read the exact BigDecimal for display,
+            // since a balance above 2^53 will not round-trip.
+            val stored = Eco.get().readAllProfileValues(uuids, key).mapValues { it.value.toDouble() }
+            uuids.associateWith { stored[it] ?: default.toDouble() }
+        }
+    }
 
     private fun registerCommands() {
         this.commands.forEach { it.register() }
@@ -158,18 +175,15 @@ open class Currency(
             }
         )
 
-        if (plugin.configYml.getBool("leaderboard.enabled"))
-            PlaceholderManager.registerPlaceholder(
-                PlayerPlaceholder(
-                    plugin,
-                    "${id}_leaderboard_rank"
-                )
-                { player ->
-                    val emptyPosition = plugin.langYml.getString("top.empty-position")
-                    val position = getPosition(player.uniqueId)
-                    position?.toString() ?: emptyPosition
-                }
-            )
+        if (plugin.configYml.getBool("leaderboard.enabled")) {
+            // Prefixed with the leaderboard suffix so the rank placeholder keeps the exact name
+            // servers already use: %ecobits_<id>_leaderboard_rank%.
+            leaderboard.registerStandardPlaceholders(
+                plugin,
+                "${id}_leaderboard",
+                plugin.langYml.getString("top.empty-position")
+            ) { BigDecimal.valueOf(it).decimalFormat(this) }
+        }
 
         PlaceholderManager.registerPlaceholder(
             PlayerlessPlaceholder(

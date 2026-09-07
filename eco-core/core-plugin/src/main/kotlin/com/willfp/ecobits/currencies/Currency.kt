@@ -8,7 +8,6 @@ import com.willfp.eco.core.config.interfaces.Config
 import com.willfp.eco.core.data.keys.PersistentDataKey
 import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.data.profile
-import com.willfp.eco.core.Eco
 import com.willfp.eco.core.leaderboard.Leaderboard
 import com.willfp.eco.core.leaderboard.Leaderboards
 import com.willfp.eco.core.leaderboard.registerStandardPlaceholders
@@ -105,42 +104,32 @@ open class Currency(
      * [Leaderboards.unregisterAll] call at the top of the reload handler.
      */
     internal fun registerLeaderboard() {
-        val enabled = plugin.configYml.getBool("leaderboard.enabled")
-
-        val leaderboard = Leaderboards.register(plugin, id) { uuids ->
-            // The leaderboard.enabled toggle is honoured here rather than by skipping registration:
-            // an empty map ranks nobody, which is what the old cache loader did when disabled.
-            if (!enabled) emptyMap() else {
-                // No zero-filter, and absent uuids are defaulted in rather than dropped: the previous
-                // implementation sorted every offline player, including those reading the key's
-                // default. Filtering would shrink trackedPlayers and drop trailing %top_N% positions.
-                // Ranked on double for ordering only - re-read the exact BigDecimal for display,
-                // since a balance above 2^53 will not round-trip.
-                val stored = Eco.get().readAllProfileValues(uuids, key).mapValues { it.value.toDouble() }
-                uuids.associateWith { stored[it] ?: default.toDouble() }
-            }
+        // Nothing at all is registered when disabled -- no leaderboard, and no placeholders. The
+        // stub rank placeholder is deliberately gone: every plugin now leaves its placeholders
+        // unregistered when its leaderboard is off, rather than three of them disagreeing.
+        if (!plugin.configYml.getBool("leaderboard.enabled")) {
+            leaderboard = null
+            return
         }
+
+        // Ranked by the currency key directly: eco reads every ranked key on the server in one
+        // batched query and updates the values in memory as they are written, neither of which it
+        // can do through an opaque provider. Players at or below the configured starting balance
+        // have not earned anything and are left unranked.
+        //
+        // Ranked on double for ordering only - the exact BigDecimal is re-read for display, since
+        // a balance above 2^53 will not round-trip.
+        val leaderboard = Leaderboards.ofKey(plugin, id, key)
 
         this.leaderboard = leaderboard
 
-        val emptyPosition = plugin.langYml.getString("top.empty-position")
-
-        if (enabled) {
-            // Prefixed with the leaderboard suffix so the rank placeholder keeps the exact name
-            // servers already use: %ecobits_<id>_leaderboard_rank%.
-            leaderboard.registerStandardPlaceholders(
-                plugin,
-                "${id}_leaderboard",
-                emptyPosition
-            ) { BigDecimal.valueOf(it).decimalFormat(this) }
-        } else {
-            // Registered even when disabled so the placeholder resolves to the empty position
-            // instead of being left unparsed, matching EcoJobs and EcoSkills. Only the rank
-            // placeholder gets a stub - the positional ones have nothing to fall back to.
-            PlayerPlaceholder(plugin, "${id}_leaderboard_rank") {
-                emptyPosition
-            }.register()
-        }
+        // Prefixed with the leaderboard suffix so the rank placeholder keeps the exact name
+        // servers already use: %ecobits_<id>_leaderboard_rank%.
+        leaderboard.registerStandardPlaceholders(
+            plugin,
+            "${id}_leaderboard",
+            plugin.langYml.getString("top.empty-position")
+        ) { BigDecimal.valueOf(it).decimalFormat(this) }
     }
 
     private fun registerCommands() {

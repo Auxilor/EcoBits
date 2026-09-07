@@ -33,6 +33,7 @@ import java.text.DecimalFormat
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
+import com.willfp.eco.util.formatEco
 
 open class Currency(
     val id: String,
@@ -128,7 +129,7 @@ open class Currency(
         leaderboard.registerStandardPlaceholders(
             plugin,
             "${id}_leaderboard",
-            plugin.langYml.getString("top.empty-position")
+            plugin.langYml.getString("top.empty-position").formatEco()
         ) { BigDecimal.valueOf(it).decimalFormat(this) }
     }
 

@@ -6,6 +6,7 @@ import com.willfp.eco.core.placeholder.context.PlaceholderContext
 import com.willfp.eco.util.formatWithCommas
 import com.willfp.eco.util.savedDisplayName
 import java.util.regex.Pattern
+import com.willfp.eco.util.formatEco
 
 object EcoBitsTopPlaceholder : RegistrablePlaceholder {
     private val pattern =
@@ -15,7 +16,7 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
     override fun getPlugin(): EcoPlugin = com.willfp.ecobits.plugin
 
     override fun getValue(params: String, ctx: PlaceholderContext): String? {
-        val emptyPosition: String = plugin.langYml.getString("top.empty-position")
+        val emptyPosition: String = plugin.langYml.getString("top.empty-position").formatEco()
         val matcher = pattern.matcher(params)
 
         if (!matcher.matches()) return null

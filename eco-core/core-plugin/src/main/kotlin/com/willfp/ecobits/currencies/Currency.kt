@@ -123,14 +123,23 @@ open class Currency(
 
         this.leaderboard = leaderboard
 
+        val emptyPosition = plugin.langYml.getString("top.empty-position")
+
         if (enabled) {
             // Prefixed with the leaderboard suffix so the rank placeholder keeps the exact name
             // servers already use: %ecobits_<id>_leaderboard_rank%.
             leaderboard.registerStandardPlaceholders(
                 plugin,
                 "${id}_leaderboard",
-                plugin.langYml.getString("top.empty-position")
+                emptyPosition
             ) { BigDecimal.valueOf(it).decimalFormat(this) }
+        } else {
+            // Registered even when disabled so the placeholder resolves to the empty position
+            // instead of being left unparsed, matching EcoJobs and EcoSkills. Only the rank
+            // placeholder gets a stub - the positional ones have nothing to fall back to.
+            PlayerPlaceholder(plugin, "${id}_leaderboard_rank") {
+                emptyPosition
+            }.register()
         }
     }
 

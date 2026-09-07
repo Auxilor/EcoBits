@@ -26,7 +26,7 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
         val formatType = matcher.group(4)
 
         val currency = Currencies.getByID(currencyId) ?: return null
-        val topEntry = currency.leaderboard.getTop(place) ?: return emptyPosition
+        val topEntry = currency.leaderboard?.getTop(place) ?: return emptyPosition
         val player = topEntry.player
 
         return when (type) {

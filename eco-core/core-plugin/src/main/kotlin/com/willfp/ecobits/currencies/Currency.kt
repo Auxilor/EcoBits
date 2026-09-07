@@ -89,17 +89,48 @@ open class Currency(
 
     val priceFactory = PriceFactoryCurrency(this)
 
-    val leaderboard: Leaderboard = Leaderboards.register(plugin, id) { uuids ->
-        // The leaderboard.enabled toggle is honoured here rather than by skipping registration:
-        // an empty map ranks nobody, which is what the old cache loader did when disabled.
-        if (!plugin.configYml.getBool("leaderboard.enabled")) emptyMap() else {
-            // No zero-filter, and absent uuids are defaulted in rather than dropped: the previous
-            // implementation sorted every offline player, including those reading the key's
-            // default. Filtering would shrink trackedPlayers and drop trailing %top_N% positions.
-            // Ranked on double for ordering only - re-read the exact BigDecimal for display,
-            // since a balance above 2^53 will not round-trip.
-            val stored = Eco.get().readAllProfileValues(uuids, key).mapValues { it.value.toDouble() }
-            uuids.associateWith { stored[it] ?: default.toDouble() }
+    /**
+     * The leaderboard ranking players by their balance of this currency, or null before the
+     * first reload has registered it.
+     */
+    var leaderboard: Leaderboard? = null
+        private set
+
+    /**
+     * Register (or re-register) this currency's leaderboard and its placeholders.
+     *
+     * Called from [com.willfp.ecobits.EcoBitsPlugin.handleReload] rather than from the
+     * constructor: currencies are rebuilt by Currencies.update() during the reload, and a
+     * leaderboard registered in the constructor would be thrown away by the
+     * [Leaderboards.unregisterAll] call at the top of the reload handler.
+     */
+    internal fun registerLeaderboard() {
+        val enabled = plugin.configYml.getBool("leaderboard.enabled")
+
+        val leaderboard = Leaderboards.register(plugin, id) { uuids ->
+            // The leaderboard.enabled toggle is honoured here rather than by skipping registration:
+            // an empty map ranks nobody, which is what the old cache loader did when disabled.
+            if (!enabled) emptyMap() else {
+                // No zero-filter, and absent uuids are defaulted in rather than dropped: the previous
+                // implementation sorted every offline player, including those reading the key's
+                // default. Filtering would shrink trackedPlayers and drop trailing %top_N% positions.
+                // Ranked on double for ordering only - re-read the exact BigDecimal for display,
+                // since a balance above 2^53 will not round-trip.
+                val stored = Eco.get().readAllProfileValues(uuids, key).mapValues { it.value.toDouble() }
+                uuids.associateWith { stored[it] ?: default.toDouble() }
+            }
+        }
+
+        this.leaderboard = leaderboard
+
+        if (enabled) {
+            // Prefixed with the leaderboard suffix so the rank placeholder keeps the exact name
+            // servers already use: %ecobits_<id>_leaderboard_rank%.
+            leaderboard.registerStandardPlaceholders(
+                plugin,
+                "${id}_leaderboard",
+                plugin.langYml.getString("top.empty-position")
+            ) { BigDecimal.valueOf(it).decimalFormat(this) }
         }
     }
 
@@ -174,16 +205,6 @@ open class Currency(
                 it.getBalance(this).toInt().toString()
             }
         )
-
-        if (plugin.configYml.getBool("leaderboard.enabled")) {
-            // Prefixed with the leaderboard suffix so the rank placeholder keeps the exact name
-            // servers already use: %ecobits_<id>_leaderboard_rank%.
-            leaderboard.registerStandardPlaceholders(
-                plugin,
-                "${id}_leaderboard",
-                plugin.langYml.getString("top.empty-position")
-            ) { BigDecimal.valueOf(it).decimalFormat(this) }
-        }
 
         PlaceholderManager.registerPlaceholder(
             PlayerlessPlaceholder(

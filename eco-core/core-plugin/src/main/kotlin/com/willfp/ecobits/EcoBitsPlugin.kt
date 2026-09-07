@@ -41,6 +41,12 @@ class EcoBitsPlugin : EcoPlugin() {
         Leaderboards.unregisterAll(this)
 
         Currencies.update()
+
+        // Registered here, after the currencies have been rebuilt, rather than from the Currency
+        // constructor: a leaderboard registered there would be deleted by the unregisterAll above.
+        for (currency in Currencies.values()) {
+            currency.registerLeaderboard()
+        }
     }
 
     override fun loadPluginCommands(): List<PluginCommand> {

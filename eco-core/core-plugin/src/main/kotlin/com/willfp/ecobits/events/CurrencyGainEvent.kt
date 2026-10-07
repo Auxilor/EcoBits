@@ -1,6 +1,7 @@
 package com.willfp.ecobits.events
 
 import com.willfp.ecobits.currencies.Currency
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
@@ -11,7 +12,7 @@ class CurrencyGainEvent(
     val currency: Currency,
     val amountGained: BigDecimal,
     val newBalance: BigDecimal
-) : Event() {
+) : Event(!Bukkit.isPrimaryThread()) {
     override fun getHandlers(): HandlerList {
         return handlerList
     }

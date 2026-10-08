@@ -3,12 +3,13 @@ package com.willfp.ecobits.currencies
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.Maps
 import com.willfp.eco.core.Eco
 import com.willfp.eco.core.price.Prices
 import com.willfp.ecobits.plugin
 
 object Currencies {
-    private val BY_ID: BiMap<String, Currency> = HashBiMap.create()
+    private val BY_ID: BiMap<String, Currency> = Maps.synchronizedBiMap(HashBiMap.create())
 
     /**
      * Get all registered [Currency]s.
@@ -17,7 +18,7 @@ object Currencies {
      */
     @JvmStatic
     fun values(): List<Currency> {
-        return ImmutableList.copyOf(BY_ID.values)
+        return synchronized(BY_ID) { ImmutableList.copyOf(BY_ID.values) }
     }
 
     /**

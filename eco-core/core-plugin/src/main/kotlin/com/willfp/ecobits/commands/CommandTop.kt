@@ -32,11 +32,11 @@ class CommandTop(
         // Run async: the leaderboard scan itself is an O(1) snapshot lookup, but reading each
         // entry's exact balance below goes through the player's profile, which hits the database
         // for anyone not currently loaded - up to ten blocking loads per invocation.
-        plugin.scheduler.runAsync {
+        plugin.scheduler.async().run {
             val currency = if (this.currency == null) {
                 if (args.isEmpty()) {
                     sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-                    return@runAsync
+                    return@run
                 }
                 Currencies.getByID(args[0].lowercase())
             } else {
@@ -45,7 +45,7 @@ class CommandTop(
 
             if (currency == null) {
                 sender.sendMessage(plugin.langYml.getMessage("invalid-currency"))
-                return@runAsync
+                return@run
             }
 
             val page = if (args.size > 1 + argOffset) {
@@ -56,7 +56,8 @@ class CommandTop(
 
             val offset = (page - 1) * 10
             val positions = ((offset + 1)..(offset + 10)).toList()
-            val top = positions.mapNotNull { currency.leaderboard?.getTop(it) }
+            val top = currency.leaderboard?.let { leaderboard -> positions.mapNotNull { leaderboard.getTop(it) } }
+                ?: emptyList()
 
             val messages = plugin.langYml.getStrings("top.format")
             val lines = mutableListOf<String>()

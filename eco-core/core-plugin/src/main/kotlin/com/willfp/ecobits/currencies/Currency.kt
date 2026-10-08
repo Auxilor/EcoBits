@@ -22,6 +22,7 @@ import com.willfp.ecobits.commands.DynamicCurrencyCommand
 import com.willfp.ecobits.events.CurrencyGainEvent
 import com.willfp.ecobits.integrations.IntegrationVault
 import com.willfp.ecobits.plugin
+import com.willfp.ecobits.runOwnedIfOnline
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -93,6 +94,7 @@ open class Currency(
      * The leaderboard ranking players by their balance of this currency, or null before the
      * first reload has registered it.
      */
+    @Volatile
     var leaderboard: Leaderboard? = null
         private set
 
@@ -332,9 +334,12 @@ fun OfflinePlayer.setBalance(currency: Currency, value: BigDecimal) {
     )
 
     if (coerced > previousBalance) {
-        Bukkit.getPluginManager().callEvent(
-            CurrencyGainEvent(this, currency, coerced - previousBalance, coerced)
-        )
+        // Listeners act on the player, whose region the caller may not own on Folia.
+        this.runOwnedIfOnline {
+            Bukkit.getPluginManager().callEvent(
+                CurrencyGainEvent(this, currency, coerced - previousBalance, coerced)
+            )
+        }
     }
 }
 

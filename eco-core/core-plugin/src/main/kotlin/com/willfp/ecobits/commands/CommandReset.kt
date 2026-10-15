@@ -1,6 +1,7 @@
 package com.willfp.ecobits.commands
 
 import com.willfp.eco.core.command.impl.Subcommand
+import com.willfp.eco.core.data.forEachSavedProfile
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
@@ -70,14 +71,16 @@ class CommandReset(
     private fun resetAllPlayersCurrency(sender: CommandSender, args: List<String>) {
         val currency = determineCurrency(sender, args) ?: return
 
-        Bukkit.getOfflinePlayers().forEach { player ->
-            player.setBalance(currency, currency.default)
+        forEachSavedProfile(plugin) { uuid ->
+            Bukkit.getOfflinePlayer(uuid).setBalance(currency, currency.default)
+        }.thenRun {
+            plugin.scheduler.global().run {
+                sender.sendMessage(
+                    plugin.langYml.getCurrencyMessage("reset-all-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+                        .withCurrencyPlaceholders(currency.default, currency)
+                )
+            }
         }
-
-        sender.sendMessage(
-            plugin.langYml.getCurrencyMessage("reset-all-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .withCurrencyPlaceholders(currency.default, currency)
-        )
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {

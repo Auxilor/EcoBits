@@ -42,6 +42,8 @@ Toggling `leaderboard.enabled` needs a full server restart, not just `/ecobits r
 
 server-id: "main" # Server ID for local currencies over MySQL/MongoDB
 
+pay-command: false # If true, /pay <player> <amount> pays in the currency registered with Vault; that currency must be payable
+
 leaderboard:
   enabled: true # If the top leaderboard is built; toggling needs a full server restart
   cache-lifetime: 60 # Lifetime of the leaderboard cache, in seconds

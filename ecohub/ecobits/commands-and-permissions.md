@@ -10,6 +10,7 @@ These are every EcoBits command and the permission node each one needs. `<curren
 | `/ecobits reload` | Reload the plugin. | `ecobits.command.reload` |
 | `/<currency>` | Access the currency commands below. | `ecobits.command.<currency>` |
 | `/<currency> pay` | Pay a player. | `ecobits.command.pay` |
+| `/pay` | Pay a player in the Vault currency. Only registered when `pay-command: true` in `config.yml`. | `ecobits.command.pay` |
 | `/<currency> balance` | Get your balance. | `ecobits.command.balance` |
 | `/<currency> get` | Get another player's balance. | `ecobits.command.get` |
 | `/<currency> give` | Give a currency. | `ecobits.command.give` |

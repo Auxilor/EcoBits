@@ -143,6 +143,13 @@ open class Currency(
         this.commands.forEach { it.unregister() }
     }
 
+    /**
+     * Unregister this currency's commands before it is replaced.
+     */
+    fun shutdown() {
+        unregisterCommands()
+    }
+
     init {
         PlaceholderManager.registerPlaceholder(
             PlayerPlaceholder(

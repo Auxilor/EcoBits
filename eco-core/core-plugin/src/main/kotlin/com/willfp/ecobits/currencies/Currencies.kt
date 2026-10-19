@@ -7,6 +7,7 @@ import com.google.common.collect.Maps
 import com.willfp.eco.core.Eco
 import com.willfp.eco.core.price.Prices
 import com.willfp.ecobits.plugin
+import org.bukkit.Bukkit
 
 object Currencies {
     private val BY_ID: BiMap<String, Currency> = Maps.synchronizedBiMap(HashBiMap.create())
@@ -39,6 +40,8 @@ object Currencies {
     fun update() {
         Eco.get().beginCommandBatch()
         try {
+            Bukkit.getServicesManager().unregisterAll(plugin)
+
             for (currency in values()) {
                 removeCurrency(currency)
             }
@@ -69,6 +72,7 @@ object Currencies {
      */
     @JvmStatic
     fun removeCurrency(currency: Currency) {
+        currency.shutdown()
         Prices.unregisterPriceFactory(currency.priceFactory)
         BY_ID.remove(currency.id)
     }

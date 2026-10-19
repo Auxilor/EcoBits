@@ -52,7 +52,7 @@ currencies:
     payable: false # If players can send this currency with /<currency> pay
     decimal: true # If decimal amounts are allowed in commands, not just whole numbers
     max-decimals: 2 # How many decimal places players may type in commands
-    vault: false # If this currency registers with Vault; only one currency can, and it needs a restart
+    vault: false # If this currency registers with Vault; only one currency can
     local: false # If true, the balance does not sync between servers
     balance-shorthand: false # If /<currency> with no arguments shows the balance instead of the help menu
 
@@ -102,7 +102,7 @@ balance-shorthand: false # Makes bare /<currency> print the balance
 ```
 
 :::warning
-Setting `vault: true` on a currency needs a full server restart, not just `/ecobits reload`, and only one currency can hold the Vault registration at a time.
+Only one currency can hold the Vault registration at a time. `/ecobits reload` applies a change to `vault`, but plugins that looked up the Vault economy at startup keep the old currency until a restart.
 :::
 
 ### Formatting
@@ -127,7 +127,7 @@ commands: # Every alias registers as a /<alias> command
 ```
 
 :::info
-Command aliases are registered when the server starts. After adding or changing the `commands` list, restart the server so the new `/<alias>` commands register; a reload alone will not.
+Command aliases are registered on startup and on `/ecobits reload`. Aliases removed from the `commands` list stop working after a reload.
 :::
 
 ## Internal placeholders
@@ -142,8 +142,8 @@ These placeholders are available inside the `format` and `format-short` strings:
 
 :::tip Troubleshooting
 - **Currency not loading?** Check the `id` uses only lowercase letters, numbers, and underscores, then run `/ecobits reload`.
-- **`/<currency>` says unknown command?** Aliases register on startup; add the alias under `commands` and restart the server.
-- **Vault plugins don't see the balance?** Only one currency can register with Vault; set `vault: true` on a single currency and restart.
+- **`/<currency>` says unknown command?** Add the alias under `commands` and run `/ecobits reload`.
+- **Vault plugins don't see the balance?** Only one currency can register with Vault; set `vault: true` on a single currency, then restart so every Vault plugin picks it up.
 :::
 
 <hr/>

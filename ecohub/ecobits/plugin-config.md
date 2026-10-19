@@ -6,7 +6,7 @@ sidebar_position: 4
 This is the main `config.yml` for EcoBits, found at `/plugins/EcoBits/config.yml`. It holds your currency definitions plus the global settings for the leaderboard and number shortcuts. Edit it, then run `/ecobits reload` to apply your changes.
 
 :::warning
-Toggling `leaderboard.enabled` and changing a currency's `vault` setting both need a full server restart, not just `/ecobits reload`, before they take effect.
+Toggling `leaderboard.enabled` needs a full server restart, not just `/ecobits reload`, before it takes effect. Changing which currency has `vault: true` applies on `/ecobits reload`, but plugins that looked up the Vault economy at startup keep the old currency until a restart.
 :::
 
 ## Default config.yml
@@ -57,7 +57,7 @@ currencies:
     payable: false # If players can send this currency with /<currency> pay
     decimal: true # If decimal amounts are allowed in commands, not just whole numbers
     max-decimals: 2 # How many decimal places players may type in commands
-    vault: false # If this currency registers with Vault; only one can, and it needs a restart
+    vault: false # If this currency registers with Vault; only one can
     local: false # If true, the balance does not sync between servers
     balance-shorthand: false # If /<currency> with no arguments shows the balance instead of the help menu
     format: "&b%symbol%&a%amount% &b%currency%" # Full balance format; placeholders %currency%, %amount%, %symbol%

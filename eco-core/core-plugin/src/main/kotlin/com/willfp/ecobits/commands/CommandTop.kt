@@ -67,7 +67,7 @@ class CommandTop(
             val messages = plugin.langYml.getStrings("top.format")
             val lines = mutableListOf<String>()
 
-            for ((index, entry) in top.withIndex()) {
+            for (entry in top) {
                 val player = entry.player
 
                 // Read the exact BigDecimal rather than the entry's double: the leaderboard ranks on
@@ -75,7 +75,7 @@ class CommandTop(
                 val balance = player.getBalance(currency)
 
                 val line = plugin.langYml.getString("top-line-format")
-                    .replace("%rank%", (offset + index + 1).toString())
+                    .replace("%rank%", entry.position.toString())
                     .replace("%balance%", balance.decimalFormat(currency))
                     .replace("%balance_short%", balance.decimalFormatShort(currency))
                     .replace("%balance_formatted%", balance.format(currency))

@@ -28,8 +28,7 @@ class DynamicCurrencyCommand(
             .addSubcommand(balanceCommand ?: CommandBalance(currency))
             .addSubcommand(CommandTake(currency))
             .addSubcommand(CommandTakesilent(currency))
-        if (plugin.configYml.getBool("leaderboard.enabled"))
-            this.addSubcommand(CommandTop(currency))
+            .addSubcommand(CommandTop(currency))
     }
 
     override fun onExecute(sender: CommandSender, args: MutableList<String>) {

@@ -32,6 +32,11 @@ class CommandTop(
         // Run async: the leaderboard scan itself is an O(1) snapshot lookup, but reading each
         // entry's exact balance below goes through the player's profile, which hits the database
         // for anyone not currently loaded - up to ten blocking loads per invocation.
+        if (!plugin.configYml.getBool("leaderboard.enabled")) {
+            sender.sendMessage(plugin.langYml.getMessage("invalid-command"))
+            return
+        }
+
         plugin.scheduler.async().run {
             val currency = if (this.currency == null) {
                 if (args.isEmpty()) {
@@ -109,6 +114,10 @@ class CommandTop(
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {
+        if (!plugin.configYml.getBool("leaderboard.enabled")) {
+            return emptyList()
+        }
+
         val completions = mutableListOf<String>()
 
         if (this.currency == null) {

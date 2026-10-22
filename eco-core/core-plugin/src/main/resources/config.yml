@@ -37,7 +37,6 @@ pay-command: false # If true, /pay <player> <amount> pays in the currency regist
 
 leaderboard:
   # You can disable the top leaderboard if you don't want it.
-  # Please note that it will require a full server restart to take into effect.
   enabled: true
 
   # Leaderboards are refreshed on a schedule by eco, shared across every plugin.

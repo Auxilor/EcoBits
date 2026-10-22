@@ -1,0 +1,171 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ArrayPrimitive:CommandGive.kt:CommandGive$arrayOf(1, 2, 3, 4, 5)</ID>
+    <ID>ArrayPrimitive:CommandGivesilent.kt:CommandGivesilent$arrayOf(1, 2, 3, 4, 5)</ID>
+    <ID>ArrayPrimitive:CommandPay.kt:CommandPay$arrayOf(1, 2, 3, 4, 5)</ID>
+    <ID>ArrayPrimitive:CommandSet.kt:CommandSet$arrayOf(1, 2, 3, 4, 5)</ID>
+    <ID>ArrayPrimitive:CommandTake.kt:CommandTake$arrayOf(1, 2, 3, 4, 5)</ID>
+    <ID>ArrayPrimitive:CommandTakesilent.kt:CommandTakesilent$arrayOf(1, 2, 3, 4, 5)</ID>
+    <ID>BracesOnIfStatements:CommandEcoBits.kt:CommandEcoBits$if</ID>
+    <ID>BracesOnIfStatements:Currency.kt:Currency$else</ID>
+    <ID>BracesOnIfStatements:Currency.kt:Currency$if</ID>
+    <ID>BracesOnIfStatements:Currency.kt:if</ID>
+    <ID>BracesOnIfStatements:DynamicCurrencyCommand.kt:DynamicCurrencyCommand$else</ID>
+    <ID>BracesOnIfStatements:DynamicCurrencyCommand.kt:DynamicCurrencyCommand$if</ID>
+    <ID>BracesOnIfStatements:EcoBitsPlugin.kt:EcoBitsPlugin$if</ID>
+    <ID>BracesOnWhenStatements:EcoBitsTopPlaceholder.kt:EcoBitsTopPlaceholder$when</ID>
+    <ID>C002:CommandReset.kt:CommandReset$forEachSavedProfile(plugin) { uuid -&gt; Bukkit.getOfflinePlayer(uuid).setBalance(currency, currency.default) }.thenRun { plugin.scheduler.global().run { sender.sendMessage( plugin.langYml.getCurrencyMessage("reset-all-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS) .withCurrencyPlaceholders(currency.default, currency) ) } }</ID>
+    <ID>CastNullableToNonNullableType:CommandGive.kt:CommandGive$as</ID>
+    <ID>CastNullableToNonNullableType:CommandPay.kt:CommandPay$as</ID>
+    <ID>CastNullableToNonNullableType:CommandTake.kt:CommandTake$as</ID>
+    <ID>CognitiveComplexMethod:CommandPay.kt:CommandPay$override fun onExecute</ID>
+    <ID>CognitiveComplexMethod:CommandTop.kt:CommandTop$override fun onExecute</ID>
+    <ID>CollapsibleIfStatements:CommandBalance.kt:CommandBalance$if (this.currency == null) { if (args.isEmpty()) { player.sendMessage(plugin.langYml.getMessage("must-specify-currency")) return } }</ID>
+    <ID>CollapsibleIfStatements:CommandGet.kt:CommandGet$if (this.currency == null) { if (args.size &lt; 2) { sender.sendMessage(plugin.langYml.getMessage("must-specify-currency")) return } }</ID>
+    <ID>CollapsibleIfStatements:CommandGet.kt:CommandGet$if (this.currency == null) { if (args.size == 2) { StringUtil.copyPartialMatches( args[1], Currencies.values().map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:CommandGive.kt:CommandGive$if (this.currency == null) { if (args.size &lt; 2) { sender.sendMessage(plugin.langYml.getMessage("must-specify-currency")) return } }</ID>
+    <ID>CollapsibleIfStatements:CommandGive.kt:CommandGive$if (this.currency == null) { if (args.size == 2) { StringUtil.copyPartialMatches( args[1], Currencies.values().map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:CommandGivesilent.kt:CommandGivesilent$if (this.currency == null) { if (args.size &lt; 2) { return } }</ID>
+    <ID>CollapsibleIfStatements:CommandGivesilent.kt:CommandGivesilent$if (this.currency == null) { if (args.size == 2) { StringUtil.copyPartialMatches( args[1], Currencies.values().map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:CommandPay.kt:CommandPay$if (currency.max != null) { if (recipient.getBalance(currency) + amount &gt; currency.max) { player.sendMessage(plugin.langYml.getCurrencyMessage("too-much", currency)) return } }</ID>
+    <ID>CollapsibleIfStatements:CommandPay.kt:CommandPay$if (this.currency == null) { if (args.size &lt; 2) { player.sendMessage(plugin.langYml.getMessage("must-specify-currency")) return } }</ID>
+    <ID>CollapsibleIfStatements:CommandPay.kt:CommandPay$if (this.currency == null) { if (args.size == 2) { StringUtil.copyPartialMatches( args[1], Currencies.values().filter { it.isPayable }.map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:CommandSet.kt:CommandSet$if (this.currency == null) { if (args.size &lt; 2) { sender.sendMessage(plugin.langYml.getMessage("must-specify-currency")) return } }</ID>
+    <ID>CollapsibleIfStatements:CommandSet.kt:CommandSet$if (this.currency == null) { if (args.size == 2) { StringUtil.copyPartialMatches( args[1], Currencies.values().map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:CommandTake.kt:CommandTake$if (this.currency == null) { if (args.size &lt; 2) { sender.sendMessage(plugin.langYml.getMessage("must-specify-currency")) return } }</ID>
+    <ID>CollapsibleIfStatements:CommandTake.kt:CommandTake$if (this.currency == null) { if (args.size == 2) { StringUtil.copyPartialMatches( args[1], Currencies.values().map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:CommandTakesilent.kt:CommandTakesilent$if (this.currency == null) { if (args.size &lt; 2) { return } }</ID>
+    <ID>CollapsibleIfStatements:CommandTakesilent.kt:CommandTakesilent$if (this.currency == null) { if (args.size == 2) { StringUtil.copyPartialMatches( args[1], Currencies.values().map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:CommandTop.kt:CommandTop$if (this.currency == null) { if (args.size == 1) { StringUtil.copyPartialMatches( args[0], Currencies.values().map { it.id }, completions ) } }</ID>
+    <ID>CollapsibleIfStatements:IntegrationVault.kt:IntegrationVault$if (currency.max != null) { if (player.getBalance(currency).toDouble() + amount &gt; currency.max.toDouble()) { return EconomyResponse( 0.0, 0.0, EconomyResponse.ResponseType.FAILURE, "Can't deposit this much (over max)" ) } }</ID>
+    <ID>CyclomaticComplexMethod:CommandGive.kt:CommandGive$override fun onExecute</ID>
+    <ID>CyclomaticComplexMethod:CommandGivesilent.kt:CommandGivesilent$override fun onExecute</ID>
+    <ID>CyclomaticComplexMethod:CommandPay.kt:CommandPay$override fun onExecute</ID>
+    <ID>CyclomaticComplexMethod:CommandSet.kt:CommandSet$override fun onExecute</ID>
+    <ID>CyclomaticComplexMethod:CommandTake.kt:CommandTake$override fun onExecute</ID>
+    <ID>CyclomaticComplexMethod:CommandTakesilent.kt:CommandTakesilent$override fun onExecute</ID>
+    <ID>CyclomaticComplexMethod:EcoBitsTopPlaceholder.kt:EcoBitsTopPlaceholder$override fun getValue: String?</ID>
+    <ID>ExpressionBodySyntax:CommandPayShortcut.kt:CommandPayShortcut$return payCommand.tabComplete(sender, args)</ID>
+    <ID>ExpressionBodySyntax:Currencies.kt:Currencies$return BY_ID[name]</ID>
+    <ID>ExpressionBodySyntax:Currencies.kt:Currencies$return synchronized(BY_ID) { ImmutableList.copyOf(BY_ID.values) }</ID>
+    <ID>ExpressionBodySyntax:Currency.kt:Currency$return other is Currency &amp;&amp; other.id == this.id</ID>
+    <ID>ExpressionBodySyntax:Currency.kt:Currency$return this.id.hashCode()</ID>
+    <ID>ExpressionBodySyntax:Currency.kt:return this.profile.read(currency.key)</ID>
+    <ID>ExpressionBodySyntax:Currency.kt:return this.setScale(0, RoundingMode.CEILING) != this.setScale(0, RoundingMode.FLOOR)</ID>
+    <ID>ExpressionBodySyntax:CurrencyGainEvent.kt:CurrencyGainEvent$return handlerList</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return "EcoBits ${currency.id}"</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return -1</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return amount.toBigDecimal().formatWithExtension()</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return createPlayerAccount(Bukkit.getOfflinePlayer(playerName))</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return currency.name</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return currencyNameSingular()</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return depositPlayer(Bukkit.getOfflinePlayer(playerName), amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return depositPlayer(player, amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return depositPlayer(playerName, amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return false</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return getBalance(Bukkit.getOfflinePlayer(playerName))</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return getBalance(player)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return getBalance(playerName)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return has(Bukkit.getOfflinePlayer(playerName), amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return has(player, amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return has(playerName, amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return hasAccount(player)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return hasAccount(playerName)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return mutableListOf()</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return player.getBalance(currency).toDouble()</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return player.getBalance(currency).toDouble() &gt;= amount</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return player.hasPlayedBefore() || player.isOnline</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return true</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return withdrawPlayer(player, amount)</ID>
+    <ID>ExpressionBodySyntax:IntegrationVault.kt:IntegrationVault$return withdrawPlayer(playerName, amount)</ID>
+    <ID>ExpressionBodySyntax:PriceFactoryCurrency.kt:PriceFactoryCurrency$return PriceCurrency(currency, baseContext) { function.get(it) }</ID>
+    <ID>ExpressionBodySyntax:PriceFactoryCurrency.kt:PriceFactoryCurrency.PriceCurrency$return multipliers[player.uniqueId] ?: 1.0</ID>
+    <ID>F008:IntegrationVault.kt:IntegrationVault.Companion$isVaultPresent</ID>
+    <ID>F010:CurrencyGainEvent.kt:CurrencyGainEvent$isPrimaryThread()</ID>
+    <ID>ForbiddenMethodCall:Currency.kt:Currency$BigDecimal(config.getDouble("default"))</ID>
+    <ID>ForbiddenMethodCall:Currency.kt:Currency$BigDecimal(config.getDouble("max"))</ID>
+    <ID>IC002:CommandPay.kt:CommandPay$// Send a message to recipient if connected</ID>
+    <ID>IC002:CommandReload.kt:CommandReload$// Reloading rebuilds shared registries, so it belongs on the global region.</ID>
+    <ID>IC002:CommandTop.kt:CommandTop$// An empty leaderboard still shows its header and footer, with the universal</ID>
+    <ID>IC002:CommandTop.kt:CommandTop$// Read the exact BigDecimal rather than the entry's double: the leaderboard ranks on</ID>
+    <ID>IC002:CommandTop.kt:CommandTop$// Run async: the leaderboard scan itself is an O(1) snapshot lookup, but reading each</ID>
+    <ID>IC002:Currency.kt:// Listeners act on the player, whose region the caller may not own on Folia.</ID>
+    <ID>IC002:Currency.kt:Currency$// Nothing at all is registered when disabled -- no leaderboard, and no placeholders. The</ID>
+    <ID>IC002:Currency.kt:Currency$// Prefixed with the leaderboard suffix so the rank placeholder keeps the exact name</ID>
+    <ID>IC002:Currency.kt:Currency$// Ranked by the currency key directly: eco reads every ranked key on the server in one</ID>
+    <ID>IC002:EcoBitsPlugin.kt:EcoBitsPlugin$// Initial preload for Vault</ID>
+    <ID>IC002:EcoBitsPlugin.kt:EcoBitsPlugin$// Registered here, after the currencies have been rebuilt, rather than from the Currency</ID>
+    <ID>IC002:EcoBitsPlugin.kt:EcoBitsPlugin$// Registration is keyed plugin:id, so a currency removed from the config would otherwise</ID>
+    <ID>IC002:EcoBitsTopPlaceholder.kt:EcoBitsTopPlaceholder$// Read the exact BigDecimal rather than the entry's double: the leaderboard ranks</ID>
+    <ID>IgnoredReturnValue:Currencies.kt:Currencies$remove(currency.id)</ID>
+    <ID>LabeledExpression:CommandTop.kt:CommandTop$@run</ID>
+    <ID>LongMethod:CommandPay.kt:CommandPay$override fun onExecute</ID>
+    <ID>LongMethod:CommandTop.kt:CommandTop$override fun onExecute</ID>
+    <ID>MagicNumber:CommandGive.kt:CommandGive$3</ID>
+    <ID>MagicNumber:CommandGive.kt:CommandGive$4</ID>
+    <ID>MagicNumber:CommandGive.kt:CommandGive$5</ID>
+    <ID>MagicNumber:CommandGivesilent.kt:CommandGivesilent$3</ID>
+    <ID>MagicNumber:CommandGivesilent.kt:CommandGivesilent$4</ID>
+    <ID>MagicNumber:CommandGivesilent.kt:CommandGivesilent$5</ID>
+    <ID>MagicNumber:CommandPay.kt:CommandPay$3</ID>
+    <ID>MagicNumber:CommandPay.kt:CommandPay$4</ID>
+    <ID>MagicNumber:CommandPay.kt:CommandPay$5</ID>
+    <ID>MagicNumber:CommandSet.kt:CommandSet$3</ID>
+    <ID>MagicNumber:CommandSet.kt:CommandSet$4</ID>
+    <ID>MagicNumber:CommandSet.kt:CommandSet$5</ID>
+    <ID>MagicNumber:CommandTake.kt:CommandTake$3</ID>
+    <ID>MagicNumber:CommandTake.kt:CommandTake$4</ID>
+    <ID>MagicNumber:CommandTake.kt:CommandTake$5</ID>
+    <ID>MagicNumber:CommandTakesilent.kt:CommandTakesilent$3</ID>
+    <ID>MagicNumber:CommandTakesilent.kt:CommandTakesilent$4</ID>
+    <ID>MagicNumber:CommandTakesilent.kt:CommandTakesilent$5</ID>
+    <ID>MagicNumber:CommandTop.kt:CommandTop$3</ID>
+    <ID>MagicNumber:CommandTop.kt:CommandTop$4</ID>
+    <ID>MagicNumber:CommandTop.kt:CommandTop$5</ID>
+    <ID>MagicNumber:Currency.kt:3</ID>
+    <ID>MaxLineLength:CommandGive.kt:CommandGive$plugin.langYml.getCurrencyMessage("received-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)</ID>
+    <ID>MaxLineLength:CommandPay.kt:CommandPay$plugin.langYml.getCurrencyMessage("received-money", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)</ID>
+    <ID>MaxLineLength:CommandReset.kt:CommandReset$plugin.langYml.getCurrencyMessage("reset-all-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)</ID>
+    <ID>MaxLineLength:CommandReset.kt:CommandReset$plugin.langYml.getCurrencyMessage("reset-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)</ID>
+    <ID>MaxLineLength:CommandTake.kt:CommandTake$plugin.langYml.getCurrencyMessage("lost-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)</ID>
+    <ID>MaxLineLength:EcoBitsTopPlaceholder.kt:EcoBitsTopPlaceholder$Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|raw|integer|short|formatted_short))?")</ID>
+    <ID>MaxLineLength:IntegrationVault.kt:IntegrationVault$"EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, \"EcoBits doesn't support bank accounts!\")"</ID>
+    <ID>NestedScopeFunctions:Currencies.kt:Currencies$apply { register() }</ID>
+    <ID>NewLineAtEndOfFile:CommandReset.kt:com.willfp.ecobits.commands.CommandReset.kt</ID>
+    <ID>NewLineAtEndOfFile:CommandTop.kt:com.willfp.ecobits.commands.CommandTop.kt</ID>
+    <ID>NewLineAtEndOfFile:EcoBitsTopPlaceholder.kt:com.willfp.ecobits.currencies.EcoBitsTopPlaceholder.kt</ID>
+    <ID>NullableToStringCall:Currency.kt:Currency$this.max.toString()</ID>
+    <ID>PF012:EcoBitsPlugin.kt:EcoBitsPlugin$values()</ID>
+    <ID>ReturnCount:CommandGet.kt:CommandGet$override fun onExecute</ID>
+    <ID>ReturnCount:CommandGive.kt:CommandGive$override fun onExecute</ID>
+    <ID>ReturnCount:CommandGivesilent.kt:CommandGivesilent$override fun onExecute</ID>
+    <ID>ReturnCount:CommandPay.kt:CommandPay$override fun onExecute</ID>
+    <ID>ReturnCount:CommandReset.kt:CommandReset$override fun onExecute</ID>
+    <ID>ReturnCount:CommandSet.kt:CommandSet$override fun onExecute</ID>
+    <ID>ReturnCount:CommandTake.kt:CommandTake$override fun onExecute</ID>
+    <ID>ReturnCount:CommandTakesilent.kt:CommandTakesilent$override fun onExecute</ID>
+    <ID>ReturnCount:EcoBitsTopPlaceholder.kt:EcoBitsTopPlaceholder$override fun getValue: String?</ID>
+    <ID>ReturnCount:IntegrationVault.kt:IntegrationVault$override fun depositPlayer: EconomyResponse</ID>
+    <ID>ReturnCount:IntegrationVault.kt:IntegrationVault$override fun withdrawPlayer: EconomyResponse</ID>
+    <ID>TooManyFunctions:Currency.kt:com.willfp.ecobits.currencies.Currency.kt</ID>
+    <ID>TooManyFunctions:IntegrationVault.kt:IntegrationVault : Economy</ID>
+    <ID>UnnamedParameterUse:CommandBalance.kt:CommandBalance$replace</ID>
+    <ID>UnnamedParameterUse:CommandReload.kt:CommandReload$replace</ID>
+    <ID>UnnamedParameterUse:CommandTop.kt:CommandTop$replace</ID>
+    <ID>UnnamedParameterUse:Currency.kt:Currency$registerStandardPlaceholders</ID>
+    <ID>UnnamedParameterUse:Currency.kt:CurrencyGainEvent</ID>
+    <ID>UnnamedParameterUse:Currency.kt:replace</ID>
+    <ID>UnnecessaryLet:CommandReset.kt:CommandReset$let { sender.sendMessage( plugin.langYml.getCurrencyMessage("reset-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS) .withCurrencyPlaceholders(currency.default, currency, player.savedDisplayName) ) }</ID>
+    <ID>UnnecessaryParentheses:CommandPay.kt:CommandPay$(!recipient.hasPlayedBefore() &amp;&amp; !recipient.isOnline)</ID>
+    <ID>UnnecessaryParentheses:CommandPay.kt:CommandPay$(recipient.uniqueId == player.uniqueId)</ID>
+    <ID>UnnecessaryParentheses:CommandTop.kt:CommandTop$(offset + 1)</ID>
+    <ID>UnnecessaryParentheses:CommandTop.kt:CommandTop$(offset + 10)</ID>
+    <ID>UnusedImport:CommandReload.kt:import com.willfp.ecobits.EcoBitsPlugin</ID>
+    <ID>UnusedImport:CommandReload.kt:import com.willfp.ecobits.currencies.Currency</ID>
+    <ID>UnusedPrivateProperty:Currency.kt:Currency$private val descCache = EcoCache.builder&lt;Int, String&gt;() .expireAfterWrite(Duration.ofMillis(plugin.configYml.getInt("gui.cache-ttl").toLong())) .build()</ID>
+    <ID>UseOrEmpty:CommandTop.kt:CommandTop$currency.leaderboard?.let { leaderboard -&gt; positions.mapNotNull { leaderboard.getTop(it) } } ?: emptyList()</ID>
+  </CurrentIssues>
+</SmellBaseline>

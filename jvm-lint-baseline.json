@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "findings": [
+    {
+      "code": "U002",
+      "path": "eco-core/core-plugin/src/main/kotlin/com/willfp/ecobits/currencies/Currency.kt",
+      "message": "Unused function `getBalance`"
+    }
+  ]
+}

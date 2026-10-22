@@ -6,7 +6,7 @@ sidebar_position: 4
 This is the main `config.yml` for EcoBits, found at `/plugins/EcoBits/config.yml`. It holds your currency definitions plus the global settings for the leaderboard and number shortcuts. Edit it, then run `/ecobits reload` to apply your changes.
 
 :::warning
-Toggling `leaderboard.enabled` needs a full server restart, not just `/ecobits reload`, before it takes effect. Changing which currency has `vault: true` applies on `/ecobits reload`, but plugins that looked up the Vault economy at startup keep the old currency until a restart.
+Changing which currency has `vault: true` applies on `/ecobits reload`, but plugins that looked up the Vault economy at startup keep the old currency until a restart.
 :::
 
 ## Default config.yml
@@ -45,7 +45,7 @@ server-id: "main" # Server ID for local currencies over MySQL/MongoDB
 pay-command: false # If true, /pay <player> <amount> pays in the currency registered with Vault; that currency must be payable
 
 leaderboard:
-  enabled: true # If the top leaderboard is built; toggling needs a full server restart
+  enabled: true # If the top leaderboard is built
   cache-lifetime: 60 # Lifetime of the leaderboard cache, in seconds
 
 shortcuts: ["", "k", "M", "B", "T", "P", "E"] # Suffixes for the short format, ordered by magnitude

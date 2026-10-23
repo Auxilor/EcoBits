@@ -32,6 +32,11 @@ class CommandTop(
         // Run async: the leaderboard scan itself is an O(1) snapshot lookup, but reading each
         // entry's exact balance below goes through the player's profile, which hits the database
         // for anyone not currently loaded - up to ten blocking loads per invocation.
+        if (!plugin.configYml.getBool("leaderboard.enabled")) {
+            sender.sendMessage(plugin.langYml.getMessage("invalid-command"))
+            return
+        }
+
         plugin.scheduler.async().run {
             val currency = if (this.currency == null) {
                 if (args.isEmpty()) {
@@ -62,7 +67,7 @@ class CommandTop(
             val messages = plugin.langYml.getStrings("top.format")
             val lines = mutableListOf<String>()
 
-            for ((index, entry) in top.withIndex()) {
+            for (entry in top) {
                 val player = entry.player
 
                 // Read the exact BigDecimal rather than the entry's double: the leaderboard ranks on
@@ -70,7 +75,7 @@ class CommandTop(
                 val balance = player.getBalance(currency)
 
                 val line = plugin.langYml.getString("top-line-format")
-                    .replace("%rank%", (offset + index + 1).toString())
+                    .replace("%rank%", entry.position.toString())
                     .replace("%balance%", balance.decimalFormat(currency))
                     .replace("%balance_short%", balance.decimalFormatShort(currency))
                     .replace("%balance_formatted%", balance.format(currency))
@@ -109,6 +114,10 @@ class CommandTop(
     }
 
     override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {
+        if (!plugin.configYml.getBool("leaderboard.enabled")) {
+            return emptyList()
+        }
+
         val completions = mutableListOf<String>()
 
         if (this.currency == null) {

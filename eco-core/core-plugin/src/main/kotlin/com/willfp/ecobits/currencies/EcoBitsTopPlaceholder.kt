@@ -21,6 +21,8 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
 
         if (!matcher.matches()) return null
 
+        if (!plugin.configYml.getBool("leaderboard.enabled")) return null
+
         val currencyId = matcher.group(1)
         val place = matcher.group(2).toIntOrNull() ?: return null
         val type = matcher.group(3)

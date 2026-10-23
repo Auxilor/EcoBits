@@ -20,8 +20,7 @@ object CommandEcoBits : PluginCommand(
             .addSubcommand(CommandBalance())
             .addSubcommand(CommandTake())
             .addSubcommand(CommandTakesilent())
-        if (plugin.configYml.getBool("leaderboard.enabled"))
-            this.addSubcommand(CommandTop())
+            .addSubcommand(CommandTop())
     }
 
     override fun onExecute(sender: CommandSender, args: List<String>) {

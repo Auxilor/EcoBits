@@ -61,7 +61,7 @@ class CommandTake(
 
         val amount = args[2 + argOffset].toBigDecimalOrNull()
 
-        if (amount == null) {
+        if (amount == null || amount.signum() <= 0) {
             sender.sendMessage(plugin.langYml.getMessage("invalid-amount"))
             return
         }

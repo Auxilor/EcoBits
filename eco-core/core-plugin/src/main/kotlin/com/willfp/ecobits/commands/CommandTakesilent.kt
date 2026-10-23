@@ -47,6 +47,8 @@ class CommandTakesilent(
 
         val amount = args[2 + argOffset].toBigDecimalOrNull() ?: return
 
+        if (amount.signum() <= 0) return
+
         if (amount.hasDecimals() && !currency.isDecimal) return
 
         if (currency.maxDecimals != null && amount.numOfDecimals() > currency.maxDecimals && currency.isDecimal) return

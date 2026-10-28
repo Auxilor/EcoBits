@@ -6,7 +6,7 @@ import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.adjustBalance
-import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.currencies.changeBalance
 import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
@@ -78,20 +78,24 @@ class CommandPay(
             return
         }
 
-        if (player.getBalance(currency) < amount) {
+        val debited = player.changeBalance(currency) { balance ->
+            if (balance < amount) null else balance - amount
+        }
+
+        if (!debited) {
             player.sendMessage(plugin.langYml.getCurrencyMessage("cannot-afford", currency))
             return
         }
 
-        if (currency.max != null) {
-            if (recipient.getBalance(currency) + amount > currency.max) {
-                player.sendMessage(plugin.langYml.getCurrencyMessage("too-much", currency))
-                return
-            }
+        val credited = recipient.changeBalance(currency) { balance ->
+            if (currency.max != null && balance + amount > currency.max) null else balance + amount
         }
 
-        recipient.adjustBalance(currency, amount)
-        player.adjustBalance(currency, -amount)
+        if (!credited) {
+            player.adjustBalance(currency, amount)
+            player.sendMessage(plugin.langYml.getCurrencyMessage("too-much", currency))
+            return
+        }
 
         // Send a message to recipient if connected
         if (recipient.isOnline) {

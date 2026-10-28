@@ -31,6 +31,7 @@ import java.time.Duration
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.Objects
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -325,33 +326,53 @@ fun BigDecimal.decimalFormatShort(currency: Currency): String {
     }
 }
 
+private const val BALANCE_LOCK_STRIPES = 64
+
+private val balanceLocks = Array(BALANCE_LOCK_STRIPES) { Any() }
+
 fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {
     return this.profile.read(currency.key)
 }
 
 fun OfflinePlayer.setBalance(currency: Currency, value: BigDecimal) {
-    val coerced = if (currency.max == null) value.coerceAtLeast(BigDecimal.ZERO)
-    else value.coerceIn(BigDecimal.ZERO..currency.max)
-
-    val previousBalance = this.getBalance(currency)
-
-    this.profile.write(
-        currency.key,
-        coerced
-    )
-
-    if (coerced > previousBalance) {
-        // Listeners act on the player, whose region the caller may not own on Folia.
-        this.runOwnedIfOnline {
-            Bukkit.getPluginManager().callEvent(
-                CurrencyGainEvent(this, currency, coerced - previousBalance, coerced)
-            )
-        }
-    }
+    this.changeBalance(currency) { value }
 }
 
 fun OfflinePlayer.adjustBalance(currency: Currency, by: BigDecimal) {
-    this.setBalance(currency, this.getBalance(currency) + by)
+    this.changeBalance(currency) { it + by }
+}
+
+/**
+ * Replace the balance with [change] of the current balance in one atomic step, so concurrent
+ * changes cannot overwrite each other. When [change] returns null the balance is left as it is.
+ *
+ * @return If the balance was changed.
+ */
+fun OfflinePlayer.changeBalance(currency: Currency, change: (BigDecimal) -> BigDecimal?): Boolean {
+    val lock = balanceLocks[Math.floorMod(Objects.hash(this.uniqueId, currency.id), balanceLocks.size)]
+
+    val (previousBalance, newBalance) = synchronized(lock) {
+        val current = this.getBalance(currency)
+        val value = change(current) ?: return false
+
+        val coerced = if (currency.max == null) value.coerceAtLeast(BigDecimal.ZERO)
+        else value.coerceIn(BigDecimal.ZERO..currency.max)
+
+        this.profile.write(currency.key, coerced)
+
+        current to coerced
+    }
+
+    if (newBalance > previousBalance) {
+        // Listeners act on the player, whose region the caller may not own on Folia.
+        this.runOwnedIfOnline {
+            Bukkit.getPluginManager().callEvent(
+                CurrencyGainEvent(this, currency, newBalance - previousBalance, newBalance)
+            )
+        }
+    }
+
+    return true
 }
 
 fun String.withCurrencyPlaceholders(amount: BigDecimal, currency: Currency, player: String? = null): String {

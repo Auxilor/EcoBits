@@ -1,7 +1,7 @@
 package com.willfp.ecobits.integrations
 
 import com.willfp.ecobits.currencies.Currency
-import com.willfp.ecobits.currencies.adjustBalance
+import com.willfp.ecobits.currencies.changeBalance
 import com.willfp.ecobits.currencies.formatWithExtension
 import com.willfp.ecobits.currencies.getBalance
 import net.milkbowl.vault.economy.Economy
@@ -120,7 +120,11 @@ class IntegrationVault(
             return EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.FAILURE, "Can't withdraw below 0.")
         }
 
-        if (player.getBalance(currency).toDouble() - amount < 0) {
+        val withdrawn = player.changeBalance(currency) { balance ->
+            if (balance.toDouble() - amount < 0) null else balance - amount.toBigDecimal()
+        }
+
+        if (!withdrawn) {
             return EconomyResponse(
                 0.0,
                 0.0,
@@ -128,8 +132,6 @@ class IntegrationVault(
                 "Can't withdraw this much!"
             )
         }
-
-        player.adjustBalance(currency, -amount.toBigDecimal())
 
         return EconomyResponse(
             amount,
@@ -165,18 +167,22 @@ class IntegrationVault(
             return EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.FAILURE, "Can't deposit below 0.")
         }
 
-        if (currency.max != null) {
-            if (player.getBalance(currency).toDouble() + amount > currency.max.toDouble()) {
-                return EconomyResponse(
-                    0.0,
-                    0.0,
-                    EconomyResponse.ResponseType.FAILURE,
-                    "Can't deposit this much (over max)"
-                )
+        val deposited = player.changeBalance(currency) { balance ->
+            if (currency.max != null && balance.toDouble() + amount > currency.max.toDouble()) {
+                null
+            } else {
+                balance + amount.toBigDecimal()
             }
         }
 
-        player.adjustBalance(currency, amount.toBigDecimal())
+        if (!deposited) {
+            return EconomyResponse(
+                0.0,
+                0.0,
+                EconomyResponse.ResponseType.FAILURE,
+                "Can't deposit this much (over max)"
+            )
+        }
         return EconomyResponse(
             amount,
             player.getBalance(currency).toDouble(),

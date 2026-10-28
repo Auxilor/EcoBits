@@ -120,8 +120,10 @@ class IntegrationVault(
             return EconomyResponse(0.0, 0.0, EconomyResponse.ResponseType.FAILURE, "Can't withdraw below 0.")
         }
 
+        val withdrawal = amount.toBigDecimal()
+
         val withdrawn = player.changeBalance(currency) { balance ->
-            if (balance.toDouble() - amount < 0) null else balance - amount.toBigDecimal()
+            if (balance < withdrawal) null else balance - withdrawal
         }
 
         if (!withdrawn) {
@@ -168,11 +170,8 @@ class IntegrationVault(
         }
 
         val deposited = player.changeBalance(currency) { balance ->
-            if (currency.max != null && balance.toDouble() + amount > currency.max.toDouble()) {
-                null
-            } else {
-                balance + amount.toBigDecimal()
-            }
+            val newBalance = balance + amount.toBigDecimal()
+            if (currency.max != null && newBalance > currency.max) null else newBalance
         }
 
         if (!deposited) {

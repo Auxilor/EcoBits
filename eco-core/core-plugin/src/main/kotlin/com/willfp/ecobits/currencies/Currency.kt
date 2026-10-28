@@ -349,9 +349,7 @@ fun OfflinePlayer.adjustBalance(currency: Currency, by: BigDecimal) {
  * @return If the balance was changed.
  */
 fun OfflinePlayer.changeBalance(currency: Currency, change: (BigDecimal) -> BigDecimal?): Boolean {
-    val lock = balanceLocks[Math.floorMod(Objects.hash(this.uniqueId, currency.id), balanceLocks.size)]
-
-    val (previousBalance, newBalance) = synchronized(lock) {
+    val (previousBalance, newBalance) = synchronized(balanceLocks[balanceLockIndex(currency)]) {
         val current = this.getBalance(currency)
         val value = change(current) ?: return false
 
@@ -374,6 +372,49 @@ fun OfflinePlayer.changeBalance(currency: Currency, change: (BigDecimal) -> BigD
 
     return true
 }
+
+enum class PaymentResult {
+    PAID,
+    CANNOT_AFFORD,
+    OVER_MAX
+}
+
+/**
+ * Move [amount] from this player to [recipient] in one atomic step, holding both balances, so no
+ * other change can land between the debit and the credit.
+ */
+fun OfflinePlayer.payBalance(recipient: OfflinePlayer, currency: Currency, amount: BigDecimal): PaymentResult {
+    val lockIndices = listOf(this.balanceLockIndex(currency), recipient.balanceLockIndex(currency)).sorted()
+    var recipientBalance = BigDecimal.ZERO
+
+    val result = synchronized(balanceLocks[lockIndices.first()]) {
+        synchronized(balanceLocks[lockIndices.last()]) {
+            val senderBalance = this.getBalance(currency)
+            recipientBalance = recipient.getBalance(currency) + amount
+
+            if (senderBalance < amount) {
+                PaymentResult.CANNOT_AFFORD
+            } else if (currency.max != null && recipientBalance > currency.max) {
+                PaymentResult.OVER_MAX
+            } else {
+                this.profile.write(currency.key, senderBalance - amount)
+                recipient.profile.write(currency.key, recipientBalance)
+                PaymentResult.PAID
+            }
+        }
+    }
+
+    if (result == PaymentResult.PAID) {
+        recipient.runOwnedIfOnline {
+            Bukkit.getPluginManager().callEvent(CurrencyGainEvent(recipient, currency, amount, recipientBalance))
+        }
+    }
+
+    return result
+}
+
+private fun OfflinePlayer.balanceLockIndex(currency: Currency) =
+    Math.floorMod(Objects.hash(this.uniqueId, currency.id), balanceLocks.size)
 
 fun String.withCurrencyPlaceholders(amount: BigDecimal, currency: Currency, player: String? = null): String {
     var message = this

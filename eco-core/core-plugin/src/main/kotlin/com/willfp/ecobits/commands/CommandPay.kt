@@ -5,11 +5,11 @@ import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
-import com.willfp.ecobits.currencies.adjustBalance
-import com.willfp.ecobits.currencies.changeBalance
+import com.willfp.ecobits.currencies.PaymentResult
 import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
+import com.willfp.ecobits.currencies.payBalance
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
@@ -78,22 +78,11 @@ class CommandPay(
             return
         }
 
-        val debited = player.changeBalance(currency) { balance ->
-            if (balance < amount) null else balance - amount
-        }
+        val result = player.payBalance(recipient, currency, amount)
 
-        if (!debited) {
-            player.sendMessage(plugin.langYml.getCurrencyMessage("cannot-afford", currency))
-            return
-        }
-
-        val credited = recipient.changeBalance(currency) { balance ->
-            if (currency.max != null && balance + amount > currency.max) null else balance + amount
-        }
-
-        if (!credited) {
-            player.adjustBalance(currency, amount)
-            player.sendMessage(plugin.langYml.getCurrencyMessage("too-much", currency))
+        if (result != PaymentResult.PAID) {
+            val message = if (result == PaymentResult.CANNOT_AFFORD) "cannot-afford" else "too-much"
+            player.sendMessage(plugin.langYml.getCurrencyMessage(message, currency))
             return
         }
 

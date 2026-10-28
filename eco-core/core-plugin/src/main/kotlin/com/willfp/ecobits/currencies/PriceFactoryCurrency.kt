@@ -5,8 +5,8 @@ import com.willfp.eco.core.placeholder.context.PlaceholderContextSupplier
 import com.willfp.eco.core.price.Price
 import com.willfp.eco.core.price.PriceFactory
 import org.bukkit.entity.Player
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
+import java.util.Collections
+import java.util.WeakHashMap
 
 class PriceFactoryCurrency(
     private val currency: Currency
@@ -24,7 +24,7 @@ class PriceFactoryCurrency(
         private val baseContext: PlaceholderContext,
         private val xp: (PlaceholderContext) -> Double
     ) : Price {
-        private val multipliers = ConcurrentHashMap<UUID, Double>()
+        private val multipliers: MutableMap<Player, Double> = Collections.synchronizedMap(WeakHashMap())
 
         override fun canAfford(player: Player, multiplier: Double) =
             player.getBalance(currency).toDouble() >= getValue(player, multiplier)
@@ -38,12 +38,10 @@ class PriceFactoryCurrency(
         override fun getValue(player: Player, multiplier: Double) =
             xp(baseContext.copyWithPlayer(player)) * getMultiplier(player) * multiplier
 
-        override fun getMultiplier(player: Player): Double {
-            return multipliers[player.uniqueId] ?: 1.0
-        }
+        override fun getMultiplier(player: Player) = multipliers[player] ?: 1.0
 
         override fun setMultiplier(player: Player, multiplier: Double) {
-            multipliers[player.uniqueId] = multiplier
+            multipliers[player] = multiplier
         }
     }
 }

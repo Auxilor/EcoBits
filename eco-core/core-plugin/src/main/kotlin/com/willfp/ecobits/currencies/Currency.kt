@@ -47,7 +47,7 @@ open class Currency(
         .expireAfterWrite(Duration.ofMillis(plugin.configYml.getInt("gui.cache-ttl").toLong()))
         .build()
 
-    val default = BigDecimal(config.getDouble("default"))
+    val default = config.getDouble("default").toBigDecimal()
 
     val name = config.getFormattedString("name")
 
@@ -56,7 +56,7 @@ open class Currency(
     val prefix: String? = if (config.has("prefix")) config.getFormattedString("prefix").ifBlank { null } else null
 
     val max: BigDecimal? = if (config.has("max") && config.getDouble("max") > 0)
-        BigDecimal(config.getDouble("max"))
+        config.getDouble("max").toBigDecimal()
     else null
 
     val isPayable = config.getBool("payable")

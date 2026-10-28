@@ -39,13 +39,15 @@ class CommandBalance(
             return
         }
 
+        val balance = player.getBalance(currency)
+
         player.sendMessage(
             plugin.langYml.getCurrencyMessage("balance", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
                 .replace("%player%", player.savedDisplayName)
-                .replace("%amount%", player.getBalance(currency).decimalFormat(currency))
-                .replace("%amount_short%", player.getBalance(currency).decimalFormatShort(currency))
-                .replace("%amount_formatted%", player.getBalance(currency).format(currency))
-                .replace("%amount_formatted_short%", player.getBalance(currency).formatShort(currency))
+                .replace("%amount%", balance.decimalFormat(currency))
+                .replace("%amount_short%", balance.decimalFormatShort(currency))
+                .replace("%amount_formatted%", balance.format(currency))
+                .replace("%amount_formatted_short%", balance.formatShort(currency))
                 .replace("%currency%", currency.name)
                 .replace("%currency_symbol%", currency.symbol)
         )

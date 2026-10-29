@@ -330,6 +330,8 @@ private const val BALANCE_LOCK_STRIPES = 64
 
 private const val MAX_EXACT_SCALE = 20
 
+private const val LEGACY_TAIL_SCALE = 12
+
 private val balanceLocks = Array(BALANCE_LOCK_STRIPES) { Any() }
 
 fun OfflinePlayer.getBalance(currency: Currency): BigDecimal =
@@ -445,4 +447,8 @@ fun LangYml.getCurrencyMessage(
 }
 
 private fun BigDecimal.withoutDoubleTail(): BigDecimal =
-    if (this.scale() > MAX_EXACT_SCALE) this.toDouble().toBigDecimal() else this
+    if (this.stripTrailingZeros().scale() > MAX_EXACT_SCALE) {
+        this.setScale(LEGACY_TAIL_SCALE, RoundingMode.HALF_EVEN)
+    } else {
+        this
+    }

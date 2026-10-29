@@ -31,6 +31,7 @@ import java.time.Duration
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.Objects
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -46,7 +47,7 @@ open class Currency(
         .expireAfterWrite(Duration.ofMillis(plugin.configYml.getInt("gui.cache-ttl").toLong()))
         .build()
 
-    val default = BigDecimal(config.getDouble("default"))
+    val default = config.getDouble("default").toBigDecimal()
 
     val name = config.getFormattedString("name")
 
@@ -55,7 +56,7 @@ open class Currency(
     val prefix: String? = if (config.has("prefix")) config.getFormattedString("prefix").ifBlank { null } else null
 
     val max: BigDecimal? = if (config.has("max") && config.getDouble("max") > 0)
-        BigDecimal(config.getDouble("max"))
+        config.getDouble("max").toBigDecimal()
     else null
 
     val isPayable = config.getBool("payable")
@@ -257,7 +258,7 @@ open class Currency(
     }
 
     internal open fun getBalance(player: OfflinePlayer) = getSavedBalance(player)
-    internal fun getSavedBalance(player: OfflinePlayer) = player.profile.read(key)
+    internal fun getSavedBalance(player: OfflinePlayer) = player.profile.read(key).withoutDoubleTail()
 
     override fun equals(other: Any?): Boolean {
         return other is Currency && other.id == this.id
@@ -325,34 +326,98 @@ fun BigDecimal.decimalFormatShort(currency: Currency): String {
     }
 }
 
-fun OfflinePlayer.getBalance(currency: Currency): BigDecimal {
-    return this.profile.read(currency.key)
-}
+private const val BALANCE_LOCK_STRIPES = 64
+
+private const val MAX_EXACT_SCALE = 20
+
+private const val LEGACY_TAIL_SCALE = 12
+
+private val balanceLocks = Array(BALANCE_LOCK_STRIPES) { Any() }
+
+fun OfflinePlayer.getBalance(currency: Currency): BigDecimal =
+    this.profile.read(currency.key).withoutDoubleTail()
 
 fun OfflinePlayer.setBalance(currency: Currency, value: BigDecimal) {
-    val coerced = if (currency.max == null) value.coerceAtLeast(BigDecimal.ZERO)
-    else value.coerceIn(BigDecimal.ZERO..currency.max)
-
-    val previousBalance = this.getBalance(currency)
-
-    this.profile.write(
-        currency.key,
-        coerced
-    )
-
-    if (coerced > previousBalance) {
-        // Listeners act on the player, whose region the caller may not own on Folia.
-        this.runOwnedIfOnline {
-            Bukkit.getPluginManager().callEvent(
-                CurrencyGainEvent(this, currency, coerced - previousBalance, coerced)
-            )
-        }
-    }
+    this.changeBalance(currency) { value }
 }
 
 fun OfflinePlayer.adjustBalance(currency: Currency, by: BigDecimal) {
-    this.setBalance(currency, this.getBalance(currency) + by)
+    this.changeBalance(currency) { it + by }
 }
+
+/**
+ * Replace the balance with [change] of the current balance in one atomic step, so concurrent
+ * changes cannot overwrite each other. When [change] returns null the balance is left as it is.
+ *
+ * @return If the balance was changed.
+ */
+fun OfflinePlayer.changeBalance(currency: Currency, change: (BigDecimal) -> BigDecimal?): Boolean {
+    val (previousBalance, newBalance) = synchronized(balanceLocks[balanceLockIndex(currency)]) {
+        val current = this.getBalance(currency)
+        val value = change(current) ?: return false
+
+        val coerced = if (currency.max == null) value.coerceAtLeast(BigDecimal.ZERO)
+        else value.coerceIn(BigDecimal.ZERO..currency.max)
+
+        this.profile.write(currency.key, coerced)
+
+        current to coerced
+    }
+
+    if (newBalance > previousBalance) {
+        // Listeners act on the player, whose region the caller may not own on Folia.
+        this.runOwnedIfOnline {
+            Bukkit.getPluginManager().callEvent(
+                CurrencyGainEvent(this, currency, newBalance - previousBalance, newBalance)
+            )
+        }
+    }
+
+    return true
+}
+
+enum class PaymentResult {
+    PAID,
+    CANNOT_AFFORD,
+    OVER_MAX
+}
+
+/**
+ * Move [amount] from this player to [recipient] in one atomic step, holding both balances, so no
+ * other change can land between the debit and the credit.
+ */
+fun OfflinePlayer.payBalance(recipient: OfflinePlayer, currency: Currency, amount: BigDecimal): PaymentResult {
+    val lockIndices = listOf(this.balanceLockIndex(currency), recipient.balanceLockIndex(currency)).sorted()
+    var recipientBalance = BigDecimal.ZERO
+
+    val result = synchronized(balanceLocks[lockIndices.first()]) {
+        synchronized(balanceLocks[lockIndices.last()]) {
+            val senderBalance = this.getBalance(currency)
+            recipientBalance = recipient.getBalance(currency) + amount
+
+            if (senderBalance < amount) {
+                PaymentResult.CANNOT_AFFORD
+            } else if (currency.max != null && recipientBalance > currency.max) {
+                PaymentResult.OVER_MAX
+            } else {
+                this.profile.write(currency.key, senderBalance - amount)
+                recipient.profile.write(currency.key, recipientBalance)
+                PaymentResult.PAID
+            }
+        }
+    }
+
+    if (result == PaymentResult.PAID) {
+        recipient.runOwnedIfOnline {
+            Bukkit.getPluginManager().callEvent(CurrencyGainEvent(recipient, currency, amount, recipientBalance))
+        }
+    }
+
+    return result
+}
+
+private fun OfflinePlayer.balanceLockIndex(currency: Currency) =
+    Math.floorMod(Objects.hash(this.uniqueId, currency.id), balanceLocks.size)
 
 fun String.withCurrencyPlaceholders(amount: BigDecimal, currency: Currency, player: String? = null): String {
     var message = this
@@ -380,3 +445,10 @@ fun LangYml.getCurrencyMessage(
     val prefix = currency.prefix ?: currency.plugin.langYml.prefix
     return prefix + this.getFormattedString("${LangYml.KEY_MESSAGES}.$key", option)
 }
+
+private fun BigDecimal.withoutDoubleTail(): BigDecimal =
+    if (this.stripTrailingZeros().scale() > MAX_EXACT_SCALE) {
+        this.setScale(LEGACY_TAIL_SCALE, RoundingMode.HALF_EVEN)
+    } else {
+        this
+    }

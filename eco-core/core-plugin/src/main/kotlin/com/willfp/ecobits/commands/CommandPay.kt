@@ -5,11 +5,11 @@ import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
-import com.willfp.ecobits.currencies.adjustBalance
-import com.willfp.ecobits.currencies.getBalance
+import com.willfp.ecobits.currencies.PaymentResult
 import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.hasDecimals
 import com.willfp.ecobits.currencies.numOfDecimals
+import com.willfp.ecobits.currencies.payBalance
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
@@ -78,20 +78,13 @@ class CommandPay(
             return
         }
 
-        if (player.getBalance(currency) < amount) {
-            player.sendMessage(plugin.langYml.getCurrencyMessage("cannot-afford", currency))
+        val result = player.payBalance(recipient, currency, amount)
+
+        if (result != PaymentResult.PAID) {
+            val message = if (result == PaymentResult.CANNOT_AFFORD) "cannot-afford" else "too-much"
+            player.sendMessage(plugin.langYml.getCurrencyMessage(message, currency))
             return
         }
-
-        if (currency.max != null) {
-            if (recipient.getBalance(currency) + amount > currency.max) {
-                player.sendMessage(plugin.langYml.getCurrencyMessage("too-much", currency))
-                return
-            }
-        }
-
-        recipient.adjustBalance(currency, amount)
-        player.adjustBalance(currency, -amount)
 
         // Send a message to recipient if connected
         if (recipient.isOnline) {

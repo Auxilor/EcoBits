@@ -1,7 +1,5 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.command.impl.Subcommand
-import wiki.ecohub.game.entity.player.PlayerUtils
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.decimalFormat
@@ -9,135 +7,91 @@ import com.willfp.ecobits.currencies.decimalFormatShort
 import com.willfp.ecobits.currencies.format
 import com.willfp.ecobits.currencies.formatShort
 import com.willfp.ecobits.currencies.getBalance
-import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.util.StringUtil
+import wiki.ecohub.core.command.CommandBuilder
+import wiki.ecohub.core.command.CommandContext
+import wiki.ecohub.data.playerbase.leaderboard.LeaderboardEntry
 import wiki.ecohub.data.playerbase.leaderboard.Leaderboards
+import wiki.ecohub.game.entity.player.PlayerUtils
 import wiki.ecohub.math.formatWithCommas
 import wiki.ecohub.ui.placeholder.placeholderContext
 import wiki.ecohub.ui.text.formatEco
 
-class CommandTop(
-    private val currency: Currency? = null
-) : Subcommand(
-    plugin,
-    "top",
-    "ecobits.command.top",
-    false
+private val pageCompletions = listOf("1", "2", "3", "4", "5")
+
+private const val PAGE_SIZE = 10
+
+/**
+ * Lines show each entry's exact balance, as the entry's double does not round-trip above 2^53.
+ * Reading it goes through the player's profile, which loads from the database for anyone
+ * offline, so the listing runs async.
+ */
+internal fun CommandBuilder<CommandSender>.topCommand(fixed: Currency?) = subcommand(
+    name = "top",
+    permission = "ecobits.command.top"
 ) {
-    private val argOffset = if (currency == null) 0 else -1
-
-    override fun onExecute(sender: CommandSender, args: List<String>) {
-        // Run async: the leaderboard scan itself is an O(1) snapshot lookup, but reading each
-        // entry's exact balance below goes through the player's profile, which hits the database
-        // for anyone not currently loaded - up to ten blocking loads per invocation.
+    executes {
         if (!plugin.configYml.getBool("leaderboard.enabled")) {
-            sender.sendMessage(plugin.langYml.getMessage("invalid-command"))
-            return
+            fail("invalid-command")
         }
 
-        plugin.scheduler.async().run {
-            val currency = if (this.currency == null) {
-                if (args.isEmpty()) {
-                    sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-                    return@run
-                }
-                Currencies.getByID(args[0].lowercase())
-            } else {
-                this.currency
-            }
+        val currency = currency(fixed, 0)
+        val page = args.getOrNull(pageIndex(fixed))?.toIntOrNull() ?: 1
 
-            if (currency == null) {
-                sender.sendMessage(plugin.langYml.getMessage("invalid-currency"))
-                return@run
-            }
-
-            val page = if (args.size > 1 + argOffset) {
-                args[1 + argOffset].toIntOrNull() ?: 1
-            } else {
-                1
-            }
-
-            val offset = (page - 1) * 10
-            val positions = ((offset + 1)..(offset + 10)).toList()
-            val top = currency.leaderboard?.let { leaderboard -> positions.mapNotNull { leaderboard.getTop(it) } }
-                ?: emptyList()
-
-            val messages = plugin.langYml.getStrings("top.format")
-            val lines = mutableListOf<String>()
-
-            for (entry in top) {
-                val player = entry.player
-
-                // Read the exact BigDecimal rather than the entry's double: the leaderboard ranks on
-                // a double, which does not round-trip a balance above 2^53.
-                val balance = player.getBalance(currency)
-
-                val line = plugin.langYml.getString("top-line-format")
-                    .replace("%rank%", entry.position.toString())
-                    .replace("%balance%", balance.decimalFormat(currency))
-                    .replace("%balance_short%", balance.decimalFormatShort(currency))
-                    .replace("%balance_formatted%", balance.format(currency))
-                    .replace("%balance_formatted_short%", balance.formatShort(currency))
-                    .replace("%balance_commas%", balance.formatWithCommas())
-                    .replace("%balance_raw%", balance.toPlainString())
-                    .replace("%balance_integer%", balance.toInt().toString())
-                    .replace("%player%", PlayerUtils.getSavedDisplayName(player))
-
-                lines.add(line)
-            }
-
-            // An empty leaderboard still shows its header and footer, with the universal
-        // "no records" message standing in for the entries.
-        if (lines.isEmpty()) {
-            lines.add(Leaderboards.getNoRecordsMessage(plugin))
-        }
-
-        val linesIndex = messages.indexOf("%lines%")
-            if (linesIndex != -1) {
-                messages.removeAt(linesIndex)
-                messages.addAll(linesIndex, lines)
-            }
-
-            for (message in messages) {
-                sender.sendMessage(
-                    message.formatEco(
-                        placeholderContext(
-                            player = sender as? Player
-                        )
-                    ).replace("%currency%", currency.name)
-                        .replace("%symbol%", currency.symbol)
-                )
-            }
-        }
+        plugin.scheduler.async().run { sendTop(currency, page) }
     }
 
-    override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {
-        if (!plugin.configYml.getBool("leaderboard.enabled")) {
-            return emptyList()
+    completes {
+        when {
+            !plugin.configYml.getBool("leaderboard.enabled") -> emptyList()
+            fixed == null && args.size == 1 -> Currencies.values().map { it.id }
+            args.size == pageIndex(fixed) + 1 -> pageCompletions
+            else -> emptyList()
         }
-
-        val completions = mutableListOf<String>()
-
-        if (this.currency == null) {
-            if (args.size == 1) {
-                StringUtil.copyPartialMatches(
-                    args[0],
-                    Currencies.values().map { it.id },
-                    completions
-                )
-            }
-        }
-
-        if (args.size == 2 + argOffset) {
-            StringUtil.copyPartialMatches(
-                args[1 + argOffset],
-                listOf(1, 2, 3, 4, 5).map { it.toString() },
-                completions
-            )
-        }
-
-        return completions
     }
+}
+
+private fun CommandContext<CommandSender>.sendTop(currency: Currency, page: Int) {
+    val offset = (page - 1) * PAGE_SIZE
+    val top = currency.leaderboard
+        ?.let { leaderboard -> (offset + 1..offset + PAGE_SIZE).mapNotNull { leaderboard.getTop(it) } }
+        .orEmpty()
+
+    val lines = top.map { lineFor(it, currency) }.ifEmpty { listOf(Leaderboards.getNoRecordsMessage(plugin)) }
+
+    val messages = plugin.langYml.getStrings("top.format").toMutableList()
+    val linesIndex = messages.indexOf("%lines%")
+
+    if (linesIndex != -1) {
+        messages.removeAt(linesIndex)
+        messages.addAll(linesIndex, lines)
+    }
+
+    val context = placeholderContext(player = sender as? Player)
+
+    for (message in messages) {
+        sender.sendMessage(
+            message.formatEco(context)
+                .replace(oldValue = "%currency%", newValue = currency.name)
+                .replace(oldValue = "%symbol%", newValue = currency.symbol)
+        )
+    }
+}
+
+private fun pageIndex(fixed: Currency?): Int = if (fixed == null) 1 else 0
+
+private fun CommandContext<CommandSender>.lineFor(entry: LeaderboardEntry, currency: Currency): String {
+    val balance = entry.player.getBalance(currency)
+
+    return plugin.langYml.getString("top-line-format")
+        .replace(oldValue = "%rank%", newValue = entry.position.toString())
+        .replace(oldValue = "%balance%", newValue = balance.decimalFormat(currency))
+        .replace(oldValue = "%balance_short%", newValue = balance.decimalFormatShort(currency))
+        .replace(oldValue = "%balance_formatted%", newValue = balance.format(currency))
+        .replace(oldValue = "%balance_formatted_short%", newValue = balance.formatShort(currency))
+        .replace(oldValue = "%balance_commas%", newValue = balance.formatWithCommas())
+        .replace(oldValue = "%balance_raw%", newValue = balance.toPlainString())
+        .replace(oldValue = "%balance_integer%", newValue = balance.toInt().toString())
+        .replace(oldValue = "%player%", newValue = PlayerUtils.getSavedDisplayName(entry.player))
 }

@@ -3,7 +3,7 @@
 package com.willfp.ecobits.currencies
 
 import com.willfp.ecobits.EcoBitsPlugin
-import com.willfp.ecobits.commands.DynamicCurrencyCommand
+import com.willfp.ecobits.commands.dynamicCurrencyCommand
 import com.willfp.ecobits.events.CurrencyGainEvent
 import com.willfp.ecobits.integrations.IntegrationVault
 import com.willfp.ecobits.plugin
@@ -73,7 +73,7 @@ open class Currency(
 
     val hasShortBalanceCommand = config.getBool("balance-shorthand")
 
-    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(it, this) }
+    val commands = config.getStrings("commands").map { dynamicCurrencyCommand(it, this) }
 
     val key = PersistentDataKey(
         plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),

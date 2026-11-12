@@ -1,85 +1,35 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.command.impl.Subcommand
-import wiki.ecohub.game.entity.player.PlayerUtils
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.getBalance
-import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
-import com.willfp.ecobits.plugin
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import org.bukkit.util.StringUtil
-import wiki.ecohub.ui.text.StringUtils
+import wiki.ecohub.core.command.CommandBuilder
+import wiki.ecohub.game.entity.player.PlayerUtils
 
-class CommandGet(
-    private val currency: Currency? = null
-) : Subcommand(
-    plugin,
-    "get",
-    "ecobits.command.get",
-    false
+internal fun CommandBuilder<CommandSender>.getCommand(fixed: Currency?) = subcommand(
+    name = "get",
+    permission = "ecobits.command.get"
 ) {
-    override fun onExecute(sender: CommandSender, args: List<String>) {
-        if (args.isEmpty()) {
-            sender.sendMessage(plugin.langYml.getMessage("must-specify-player"))
-            return
-        }
-
-        @Suppress("DEPRECATION")
-        val player = Bukkit.getOfflinePlayer(args[0])
-
-        if (!player.hasPlayedBefore() && !player.isOnline) {
-            sender.sendMessage(plugin.langYml.getMessage("invalid-player"))
-            return
-        }
-
-        if (this.currency == null) {
-            if (args.size < 2) {
-                sender.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-                return
-            }
-        }
-
-        val currency = this.currency ?: Currencies.getByID(args[1].lowercase())
-
-        if (currency == null) {
-            sender.sendMessage(plugin.langYml.getMessage("invalid-currency"))
-            return
-        }
+    executes {
+        val player = knownPlayer()
+        val currency = currency(fixed, 1)
 
         sender.sendMessage(
-            plugin.langYml.getCurrencyMessage("other-balance", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .withCurrencyPlaceholders(player.getBalance(currency), currency, PlayerUtils.getSavedDisplayName(player))
+            currencyMessage("other-balance", currency).withCurrencyPlaceholders(
+                player.getBalance(currency),
+                currency,
+                PlayerUtils.getSavedDisplayName(player)
+            )
         )
     }
 
-    override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {
-        val completions = mutableListOf<String>()
-
-        if (args.isEmpty()) {
-            return Bukkit.getOnlinePlayers().map { it.name }
+    completes {
+        when {
+            args.size == 1 -> playerNames()
+            fixed == null && args.size == 2 -> Currencies.values().map { it.id }
+            else -> emptyList()
         }
-
-        if (args.size == 1) {
-            StringUtil.copyPartialMatches(
-                args[0],
-                Bukkit.getOnlinePlayers().map { it.name },
-                completions
-            )
-        }
-
-        if (this.currency == null) {
-            if (args.size == 2) {
-                StringUtil.copyPartialMatches(
-                    args[1],
-                    Currencies.values().map { it.id },
-                    completions
-                )
-            }
-        }
-
-        return completions
     }
 }

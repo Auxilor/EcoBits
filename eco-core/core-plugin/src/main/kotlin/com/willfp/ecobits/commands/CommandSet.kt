@@ -1,8 +1,7 @@
 package com.willfp.ecobits.commands
 
 import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.savedDisplayName
+import wiki.ecohub.game.entity.player.PlayerUtils
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.getCurrencyMessage
@@ -14,6 +13,7 @@ import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
+import wiki.ecohub.ui.text.StringUtils
 
 class CommandSet(
     private val currency: Currency? = null
@@ -79,7 +79,7 @@ class CommandSet(
 
         sender.sendMessage(
             plugin.langYml.getCurrencyMessage("set-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .withCurrencyPlaceholders(amount, currency, player.savedDisplayName)
+                .withCurrencyPlaceholders(amount, currency, PlayerUtils.getSavedDisplayName(player))
         )
     }
 

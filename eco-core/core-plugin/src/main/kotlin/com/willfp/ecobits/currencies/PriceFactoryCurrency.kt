@@ -1,10 +1,10 @@
 package com.willfp.ecobits.currencies
 
-import com.willfp.eco.core.placeholder.context.PlaceholderContext
-import com.willfp.eco.core.placeholder.context.PlaceholderContextSupplier
-import com.willfp.eco.core.price.Price
-import com.willfp.eco.core.price.PriceFactory
 import org.bukkit.entity.Player
+import wiki.ecohub.core.price.Price
+import wiki.ecohub.core.price.PriceFactory
+import wiki.ecohub.ui.placeholder.PlaceholderContext
+import wiki.ecohub.ui.placeholder.PlaceholderContextSupplier
 import java.util.Collections
 import java.util.WeakHashMap
 

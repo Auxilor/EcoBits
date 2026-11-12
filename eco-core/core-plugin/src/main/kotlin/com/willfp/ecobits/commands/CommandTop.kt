@@ -1,22 +1,22 @@
 package com.willfp.ecobits.commands
 
 import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.core.leaderboard.Leaderboards
-import com.willfp.eco.core.placeholder.context.placeholderContext
-import com.willfp.eco.util.formatEco
-import com.willfp.eco.util.formatWithCommas
-import com.willfp.eco.util.savedDisplayName
+import wiki.ecohub.game.entity.player.PlayerUtils
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.decimalFormat
 import com.willfp.ecobits.currencies.decimalFormatShort
 import com.willfp.ecobits.currencies.format
-import com.willfp.ecobits.currencies.getBalance
 import com.willfp.ecobits.currencies.formatShort
+import com.willfp.ecobits.currencies.getBalance
 import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
+import wiki.ecohub.data.playerbase.leaderboard.Leaderboards
+import wiki.ecohub.math.formatWithCommas
+import wiki.ecohub.ui.placeholder.placeholderContext
+import wiki.ecohub.ui.text.formatEco
 
 class CommandTop(
     private val currency: Currency? = null
@@ -83,7 +83,7 @@ class CommandTop(
                     .replace("%balance_commas%", balance.formatWithCommas())
                     .replace("%balance_raw%", balance.toPlainString())
                     .replace("%balance_integer%", balance.toInt().toString())
-                    .replace("%player%", player.savedDisplayName)
+                    .replace("%player%", PlayerUtils.getSavedDisplayName(player))
 
                 lines.add(line)
             }

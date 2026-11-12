@@ -1,19 +1,20 @@
 package com.willfp.ecobits.currencies
 
-import com.willfp.eco.core.EcoPlugin
-import com.willfp.eco.core.placeholder.RegistrablePlaceholder
-import com.willfp.eco.core.placeholder.context.PlaceholderContext
-import com.willfp.eco.util.formatWithCommas
-import com.willfp.eco.util.savedDisplayName
+import com.willfp.ecobits.plugin
+import wiki.ecohub.core.plugin.EcoPlugin
+import wiki.ecohub.game.entity.player.PlayerUtils
+import wiki.ecohub.math.formatWithCommas
+import wiki.ecohub.ui.placeholder.PlaceholderContext
+import wiki.ecohub.ui.placeholder.RegistrablePlaceholder
+import wiki.ecohub.ui.text.formatEco
 import java.util.regex.Pattern
-import com.willfp.eco.util.formatEco
 
 object EcoBitsTopPlaceholder : RegistrablePlaceholder {
     private val pattern =
         Pattern.compile("top_([a-z0-9_]+)_(\\d+)_(name|amount)(?:_(commas|formatted|raw|integer|short|formatted_short))?")
 
     override fun getPattern(): Pattern = pattern
-    override fun getPlugin(): EcoPlugin = com.willfp.ecobits.plugin
+    override fun getPlugin(): EcoPlugin = plugin
 
     override fun getValue(params: String, ctx: PlaceholderContext): String? {
         val emptyPosition: String = plugin.langYml.getString("top.empty-position").formatEco()
@@ -33,7 +34,7 @@ object EcoBitsTopPlaceholder : RegistrablePlaceholder {
         val player = topEntry.player
 
         return when (type) {
-            "name" -> player.savedDisplayName
+            "name" -> PlayerUtils.getSavedDisplayName(player)
             "amount" -> {
                 // Read the exact BigDecimal rather than the entry's double: the leaderboard ranks
                 // on a double, which does not round-trip a balance above 2^53.

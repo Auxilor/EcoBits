@@ -1,8 +1,7 @@
 package com.willfp.ecobits.commands
 
 import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.savedDisplayName
+import wiki.ecohub.game.entity.player.PlayerUtils
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.getBalance
@@ -12,6 +11,7 @@ import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.util.StringUtil
+import wiki.ecohub.ui.text.StringUtils
 
 class CommandGet(
     private val currency: Currency? = null
@@ -51,7 +51,7 @@ class CommandGet(
 
         sender.sendMessage(
             plugin.langYml.getCurrencyMessage("other-balance", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .withCurrencyPlaceholders(player.getBalance(currency), currency, player.savedDisplayName)
+                .withCurrencyPlaceholders(player.getBalance(currency), currency, PlayerUtils.getSavedDisplayName(player))
         )
     }
 

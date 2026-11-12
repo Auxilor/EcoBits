@@ -4,11 +4,11 @@ import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Maps
-import com.willfp.eco.core.Eco
-import com.willfp.eco.core.price.Prices
 import com.willfp.ecobits.commands.CommandPayShortcut
 import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
+import wiki.ecohub.core.Eco
+import wiki.ecohub.core.price.Prices
 
 object Currencies {
     private val BY_ID: BiMap<String, Currency> = Maps.synchronizedBiMap(HashBiMap.create())

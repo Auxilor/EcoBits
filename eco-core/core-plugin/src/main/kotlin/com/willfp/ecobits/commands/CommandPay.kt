@@ -1,8 +1,7 @@
 package com.willfp.ecobits.commands
 
 import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.savedDisplayName
+import wiki.ecohub.game.entity.player.PlayerUtils
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.PaymentResult
@@ -16,6 +15,7 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
+import wiki.ecohub.ui.text.StringUtils
 import java.math.BigDecimal
 
 class CommandPay(
@@ -90,13 +90,13 @@ class CommandPay(
         if (recipient.isOnline) {
             (recipient.player as Player).sendMessage(
                 plugin.langYml.getCurrencyMessage("received-money", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                    .withCurrencyPlaceholders(amount, currency, player.savedDisplayName)
+                    .withCurrencyPlaceholders(amount, currency, PlayerUtils.getSavedDisplayName(player))
             )
         }
 
         player.sendMessage(
             plugin.langYml.getCurrencyMessage("paid-player", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .withCurrencyPlaceholders(amount, currency, recipient.savedDisplayName)
+                .withCurrencyPlaceholders(amount, currency, PlayerUtils.getSavedDisplayName(recipient))
         )
     }
 

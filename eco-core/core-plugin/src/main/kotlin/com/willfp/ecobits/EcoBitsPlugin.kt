@@ -1,14 +1,14 @@
 package com.willfp.ecobits
 
-import com.willfp.eco.core.EcoPlugin
-import com.willfp.eco.core.bstats.EcoMetricsChart
-import com.willfp.eco.core.command.impl.PluginCommand
-import com.willfp.eco.core.leaderboard.Leaderboards
-import com.willfp.eco.util.ClassUtils
-import com.willfp.ecobits.commands.CommandEcoBits
+import com.willfp.ecobits.commands.ecoBitsCommand
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.EcoBitsTopPlaceholder
 import com.willfp.ecobits.integrations.IntegrationVault
+import wiki.ecohub.core.command.EcoCommand
+import wiki.ecohub.core.plugin.EcoPlugin
+import wiki.ecohub.core.stdlib.ClassUtils
+import wiki.ecohub.data.playerbase.leaderboard.Leaderboards
+import wiki.ecohub.provider.metrics.EcoMetricsChart
 
 internal lateinit var plugin: EcoBitsPlugin
     private set
@@ -48,9 +48,9 @@ class EcoBitsPlugin : EcoPlugin() {
         }
     }
 
-    override fun loadPluginCommands(): List<PluginCommand> {
+    override fun loadPluginCommands(): List<EcoCommand> {
         return listOf(
-            CommandEcoBits
+            ecoBitsCommand()
         )
     }
 

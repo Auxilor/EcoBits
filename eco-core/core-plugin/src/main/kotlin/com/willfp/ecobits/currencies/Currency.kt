@@ -2,23 +2,8 @@
 
 package com.willfp.ecobits.currencies
 
-import com.willfp.eco.core.cache.EcoCache
-import com.willfp.eco.core.config.base.LangYml
-import com.willfp.eco.core.config.interfaces.Config
-import com.willfp.eco.core.data.keys.PersistentDataKey
-import com.willfp.eco.core.data.keys.PersistentDataKeyType
-import com.willfp.eco.core.data.profile
-import com.willfp.eco.core.leaderboard.Leaderboard
-import com.willfp.eco.core.leaderboard.Leaderboards
-import com.willfp.eco.core.leaderboard.registerStandardPlaceholders
-import com.willfp.eco.core.integrations.placeholder.PlaceholderManager
-import com.willfp.eco.core.placeholder.PlayerPlaceholder
-import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
-import com.willfp.eco.core.price.Prices
-import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.formatWithCommas
 import com.willfp.ecobits.EcoBitsPlugin
-import com.willfp.ecobits.commands.DynamicCurrencyCommand
+import com.willfp.ecobits.commands.dynamicCurrencyCommand
 import com.willfp.ecobits.events.CurrencyGainEvent
 import com.willfp.ecobits.integrations.IntegrationVault
 import com.willfp.ecobits.plugin
@@ -27,15 +12,30 @@ import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.plugin.ServicePriority
-import java.time.Duration
+import wiki.ecohub.config.Config
+import wiki.ecohub.config.lang.LangYml
+import wiki.ecohub.core.price.Prices
+import wiki.ecohub.data.PersistentDataKey
+import wiki.ecohub.data.PersistentDataKeyType
+import wiki.ecohub.data.cache.EcoCache
+import wiki.ecohub.data.playerbase.leaderboard.Leaderboard
+import wiki.ecohub.data.playerbase.leaderboard.Leaderboards
+import wiki.ecohub.data.playerbase.leaderboard.registerStandardPlaceholders
+import wiki.ecohub.game.entity.player.profile
+import wiki.ecohub.math.formatWithCommas
+import wiki.ecohub.ui.placeholder.PlaceholderManager
+import wiki.ecohub.ui.placeholder.type.PlayerPlaceholder
+import wiki.ecohub.ui.placeholder.type.PlayerlessPlaceholder
+import wiki.ecohub.ui.text.StringUtils
+import wiki.ecohub.ui.text.formatEco
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.time.Duration
 import java.util.Objects
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
-import com.willfp.eco.util.formatEco
 
 open class Currency(
     val id: String,
@@ -73,7 +73,7 @@ open class Currency(
 
     val hasShortBalanceCommand = config.getBool("balance-shorthand")
 
-    val commands = config.getStrings("commands").map { DynamicCurrencyCommand(it, this) }
+    val commands = config.getStrings("commands").map { dynamicCurrencyCommand(it, this) }
 
     val key = PersistentDataKey(
         plugin.createNamespacedKey(if (isLocal) "${plugin.serverID}_${id}" else id),
@@ -442,7 +442,7 @@ fun LangYml.getCurrencyMessage(
     currency: Currency,
     option: StringUtils.FormatOption = StringUtils.FormatOption.WITH_PLACEHOLDERS
 ): String {
-    val prefix = currency.prefix ?: currency.plugin.langYml.prefix
+    val prefix = currency.prefix ?: currency.plugin.langYml.getPrefix()
     return prefix + this.getFormattedString("${LangYml.KEY_MESSAGES}.$key", option)
 }
 

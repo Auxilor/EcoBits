@@ -1,8 +1,5 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.currencies.decimalFormat
@@ -14,62 +11,38 @@ import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.plugin
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.util.StringUtil
+import wiki.ecohub.core.command.CommandBuilder
+import wiki.ecohub.game.entity.player.PlayerUtils
+import wiki.ecohub.ui.text.StringUtils
 
-class CommandBalance(
-    private val currency: Currency? = null
-) : Subcommand(
-    plugin,
-    "balance",
-    "ecobits.command.balance",
-    true
+internal fun CommandBuilder<CommandSender>.balanceCommand(fixed: Currency?) = playerSubcommand(
+    name = "balance",
+    permission = "ecobits.command.balance"
 ) {
-    override fun onExecute(player: Player, args: List<String>) {
-        if (this.currency == null) {
-            if (args.isEmpty()) {
-                player.sendMessage(plugin.langYml.getMessage("must-specify-currency"))
-                return
-            }
-        }
-
-        val currency = this.currency ?: Currencies.getByID(args[0].lowercase())
-
-        if (currency == null) {
-            player.sendMessage(plugin.langYml.getMessage("invalid-currency"))
-            return
-        }
-
-        val balance = player.getBalance(currency)
-
-        player.sendMessage(
-            plugin.langYml.getCurrencyMessage("balance", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                .replace("%player%", player.savedDisplayName)
-                .replace("%amount%", balance.decimalFormat(currency))
-                .replace("%amount_short%", balance.decimalFormatShort(currency))
-                .replace("%amount_formatted%", balance.format(currency))
-                .replace("%amount_formatted_short%", balance.formatShort(currency))
-                .replace("%currency%", currency.name)
-                .replace("%currency_symbol%", currency.symbol)
-        )
+    executes {
+        sendBalance(sender, currency(fixed, 0))
     }
 
-    override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {
-        val completions = mutableListOf<String>()
-
-        if (this.currency == null) {
-            if (args.isEmpty()) {
-                return Currencies.values().map { it.id }
-            }
-
-            if (args.size == 1) {
-                StringUtil.copyPartialMatches(
-                    args[0],
-                    Currencies.values().map { it.id },
-                    completions
-                )
-            }
+    completes {
+        if (fixed == null && args.size == 1) {
+            Currencies.values().map { it.id }
+        } else {
+            emptyList()
         }
-
-        return completions
     }
+}
+
+internal fun sendBalance(player: Player, currency: Currency) {
+    val balance = player.getBalance(currency)
+
+    player.sendMessage(
+        plugin.langYml.getCurrencyMessage("balance", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
+            .replace(oldValue = "%player%", newValue = PlayerUtils.getSavedDisplayName(player))
+            .replace(oldValue = "%amount%", newValue = balance.decimalFormat(currency))
+            .replace(oldValue = "%amount_short%", newValue = balance.decimalFormatShort(currency))
+            .replace(oldValue = "%amount_formatted%", newValue = balance.format(currency))
+            .replace(oldValue = "%amount_formatted_short%", newValue = balance.formatShort(currency))
+            .replace(oldValue = "%currency%", newValue = currency.name)
+            .replace(oldValue = "%currency_symbol%", newValue = currency.symbol)
+    )
 }

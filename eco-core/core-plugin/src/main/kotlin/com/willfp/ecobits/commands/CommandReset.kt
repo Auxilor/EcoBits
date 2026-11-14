@@ -1,111 +1,66 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.command.impl.Subcommand
-import com.willfp.eco.core.data.forEachSavedProfile
-import com.willfp.eco.util.StringUtils
-import com.willfp.eco.util.savedDisplayName
 import com.willfp.ecobits.currencies.Currencies
 import com.willfp.ecobits.currencies.Currency
-import com.willfp.ecobits.currencies.getCurrencyMessage
 import com.willfp.ecobits.currencies.setBalance
 import com.willfp.ecobits.currencies.withCurrencyPlaceholders
-import com.willfp.ecobits.plugin
 import org.bukkit.Bukkit
-import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
-import org.bukkit.util.StringUtil
+import wiki.ecohub.core.command.CommandBuilder
+import wiki.ecohub.core.command.CommandContext
+import wiki.ecohub.data.playerbase.forEachSavedProfile
+import wiki.ecohub.game.entity.player.PlayerUtils
+import java.util.logging.Level
 
-class CommandReset(
-    private val currency: Currency? = null
-) : Subcommand(
-    plugin,
-    "reset",
-    "ecobits.command.reset",
-    false
+internal fun CommandBuilder<CommandSender>.resetCommand(fixed: Currency?) = subcommand(
+    name = "reset",
+    permission = "ecobits.command.reset"
 ) {
-    private val argOffset = if (currency == null) 0 else -1
-
-    override fun onExecute(sender: CommandSender, args: List<String>) {
-        if (args.isEmpty()) {
-            sender.sendMessage(plugin.langYml.getMessage("must-specify-player"))
-            return
+    executes {
+        if (argument(0, "must-specify-player").equals("all", true)) {
+            resetAllPlayers(resetCurrency(fixed))
+        } else {
+            resetPlayer(fixed)
         }
-
-        if (args[0].equals("all", true)) {
-            resetAllPlayersCurrency(sender, args)
-            return
-        }
-
-        @Suppress("DEPRECATION")
-        val player = Bukkit.getOfflinePlayer(args[0])
-
-        if (!player.hasPlayedBefore() && !player.isOnline) {
-            sender.sendMessage(plugin.langYml.getMessage("invalid-player"))
-            return
-        }
-
-        val currency = determineCurrency(sender, args) ?: return
-        resetPlayerCurrency(sender, player, currency)
     }
 
-    private fun determineCurrency(sender: CommandSender, args: List<String>): Currency? {
-        val currency = this.currency
-            ?: if (args.size > argOffset + 1) Currencies.getByID(args[argOffset + 1].lowercase()) else null
-        if (currency == null) {
-            sender.sendMessage(plugin.langYml.getMessage("invalid-currency"))
+    completes {
+        when {
+            args.size == 1 -> Bukkit.getOfflinePlayers().mapNotNull { it.name } + "all"
+            fixed == null && args.size == 2 -> Currencies.values().map { it.id }
+            else -> emptyList()
         }
-        return currency
     }
+}
 
-    private fun resetPlayerCurrency(sender: CommandSender, player: OfflinePlayer, currency: Currency) {
-        player.setBalance(currency, currency.default)
+private fun CommandContext<CommandSender>.resetPlayer(fixed: Currency?) {
+    val player = knownPlayer()
+    val currency = resetCurrency(fixed)
 
-        player.name?.let {
+    player.setBalance(currency, currency.default)
+
+    if (player.name != null) {
+        sender.sendMessage(
+            currencyMessage("reset-currency", currency)
+                .withCurrencyPlaceholders(currency.default, currency, PlayerUtils.getSavedDisplayName(player))
+        )
+    }
+}
+
+private fun CommandContext<CommandSender>.resetCurrency(fixed: Currency?): Currency =
+    fixed ?: args.getOrNull(1)?.let { Currencies.getByID(it.lowercase()) } ?: fail("invalid-currency")
+
+private fun CommandContext<CommandSender>.resetAllPlayers(currency: Currency) {
+    forEachSavedProfile(plugin) { uuid ->
+        Bukkit.getOfflinePlayer(uuid).setBalance(currency, currency.default)
+    }.thenRun {
+        plugin.scheduler.global().run {
             sender.sendMessage(
-                plugin.langYml.getCurrencyMessage("reset-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                    .withCurrencyPlaceholders(currency.default, currency, player.savedDisplayName)
+                currencyMessage("reset-all-currency", currency).withCurrencyPlaceholders(currency.default, currency)
             )
         }
-    }
-
-    private fun resetAllPlayersCurrency(sender: CommandSender, args: List<String>) {
-        val currency = determineCurrency(sender, args) ?: return
-
-        forEachSavedProfile(plugin) { uuid ->
-            Bukkit.getOfflinePlayer(uuid).setBalance(currency, currency.default)
-        }.thenRun {
-            plugin.scheduler.global().run {
-                sender.sendMessage(
-                    plugin.langYml.getCurrencyMessage("reset-all-currency", currency, StringUtils.FormatOption.WITHOUT_PLACEHOLDERS)
-                        .withCurrencyPlaceholders(currency.default, currency)
-                )
-            }
-        }
-    }
-
-    override fun tabComplete(sender: CommandSender, args: List<String>): List<String> {
-        val completions = mutableListOf<String>()
-
-        if (args.isEmpty()) {
-            return Bukkit.getOfflinePlayers().mapNotNull { it.name }
-        }
-
-        if (args.size == 1) {
-            StringUtil.copyPartialMatches(
-                args[0],
-                Bukkit.getOfflinePlayers().map { it.name } + listOf("all"),
-                completions
-            )
-        }
-
-        if (this.currency == null && args.size == 2) {
-            StringUtil.copyPartialMatches(
-                args[1],
-                Currencies.values().map { it.id },
-                completions
-            )
-        }
-
-        return completions
+    }.exceptionally { error ->
+        plugin.logger.log(Level.SEVERE, "Failed to reset ${currency.id} for every player", error)
+        null
     }
 }

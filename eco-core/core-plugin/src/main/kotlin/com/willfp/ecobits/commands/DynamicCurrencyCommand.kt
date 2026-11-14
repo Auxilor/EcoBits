@@ -1,43 +1,41 @@
 package com.willfp.ecobits.commands
 
-import com.willfp.eco.core.command.impl.PluginCommand
 import com.willfp.ecobits.currencies.Currency
 import com.willfp.ecobits.plugin
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import wiki.ecohub.core.command.EcoCommand
+import wiki.ecohub.core.command.command
+import wiki.ecohub.core.command.playerCommand
 
-class DynamicCurrencyCommand(
-    label: String,
-    val currency: Currency
-) : PluginCommand(
-    plugin,
-    label,
-    "ecobits.command.${currency.id}",
-    false
-) {
-    private val balanceCommand = if (this.currency.hasShortBalanceCommand) CommandBalance(this.currency)
-        else null
+/**
+ * A command bound to [currency]. With `balance-shorthand`, running it bare shows a player
+ * their balance.
+ */
+internal fun dynamicCurrencyCommand(label: String, currency: Currency): EcoCommand =
+    plugin.command(name = label, permission = "ecobits.command.${currency.id}") {
+        currencySubcommands(currency)
 
-    init {
-        this.addSubcommand(CommandGive(currency))
-            .addSubcommand(CommandGivesilent(currency))
-            .addSubcommand(CommandGet(currency))
-            .addSubcommand(CommandSet(currency))
-            .addSubcommand(CommandReset(currency))
-            .addSubcommand(CommandPay(currency))
-            .addSubcommand(balanceCommand ?: CommandBalance(currency))
-            .addSubcommand(CommandTake(currency))
-            .addSubcommand(CommandTakesilent(currency))
-            .addSubcommand(CommandTop(currency))
-    }
+        executes {
+            val player = sender as? Player
 
-    override fun onExecute(sender: CommandSender, args: MutableList<String>) {
-        if (balanceCommand != null && sender is Player) {
-            balanceCommand.onExecute(sender, args)
-        } else {
-            sender.sendMessage(
-                plugin.langYml.getMessage("invalid-command")
-            )
+            if (player == null || !currency.hasShortBalanceCommand) {
+                fail("invalid-command")
+            }
+
+            sendBalance(player, currency)
         }
     }
-}
+
+/**
+ * `/pay` for the currency registered with Vault.
+ */
+internal fun payShortcutCommand(currency: Currency): EcoCommand =
+    plugin.playerCommand(name = "pay", permission = "ecobits.command.pay") {
+        executes {
+            pay(currency)
+        }
+
+        completes {
+            payCompletions(currency)
+        }
+    }

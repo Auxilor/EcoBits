@@ -67,7 +67,7 @@ afterEvaluate {
     // The public artifact is what other plugins compile against, so it must be the
     // plain jar, not shadowJar: shadowJar drops META-INF (taking the .kotlin_module
     // with it, which hides every top-level declaration from the Kotlin compiler) and
-    // relocates kotlin.* into com.willfp.eco.libs.kotlin, which rewrites @kotlin.Metadata
+    // relocates kotlin.* into wiki.ecohub.libs.kotlin, which rewrites @kotlin.Metadata
     // and makes the whole API read as Java. eco publishes its API the same way.
     publishing.publications.named<MavenPublication>("release") {
         artifact(project(":eco-core:core-plugin").tasks.named<Jar>("jar")) {
@@ -104,7 +104,7 @@ allprojects {
     }
 
     dependencies {
-        compileOnly("com.willfp:eco:$ecoVersion")
+        compileOnly("wiki.ecohub:eco:$ecoVersion")
         compileOnly("org.jetbrains:annotations:26.0.2")
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
 
@@ -118,10 +118,9 @@ allprojects {
     tasks {
         shadowJar {
             exclude("META-INF/**")
-            relocate("kotlin", "com.willfp.eco.libs.kotlin")
-            relocate("kotlin.jvm", "com.willfp.eco.libs.kotlin.jvm")
-            relocate("kotlin.coroutines", "com.willfp.eco.libs.kotlin.coroutines")
-            relocate("kotlin.reflect", "com.willfp.eco.libs.kotlin.reflect")
+            relocate("kotlin", "wiki.ecohub.libs.kotlin") {
+                exclude("kotlin.kotlin_builtins")
+            }
         }
 
         compileKotlin {
